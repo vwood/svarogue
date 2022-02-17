@@ -18,13 +18,13 @@ jobs:
           override: true
 
       - name: Build
-        run: cargo build --all --release && strip target/release/$PROJECT_NAME && mv target/release/$PROJECT_NAME target/release/$PROJECT_NAME_amd64
+        run: cargo build --all --release && strip target/release/svarogue && mv target/release/svarogue target/release/svarogue_amd64
 
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startswith(github.ref, 'refs/tags/')
         with:
-          files: target/release/$PROJECT_NAME_amd64 
+          files: target/release/svarogue_amd64 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             
@@ -49,7 +49,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: startswith(github.ref, 'refs/tags/')
         with:
-          files: target/release/$PROJECT_NAME.exe
+          files: target/release/svarogue.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             
