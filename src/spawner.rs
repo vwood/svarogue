@@ -2,7 +2,7 @@ use super::{
     map::MAPWIDTH, random_table::RandomTable, AreaOfEffect, BlocksTile, CombatStats, Confusion,
     Consumable, DefenseBonus, EntryTrigger, EquipmentSlot, Equippable, InflictsDamage, Item,
     MeleePowerBonus, Monster, Name, Player, Position, ProvidesHealing, Ranged, Rect, Renderable,
-    SerializeMe, Viewshed,
+    SerializeMe, Viewshed, SingleActivation,
 };
 use rltk::{RandomNumberGenerator, RGB};
 use specs::prelude::*;
@@ -321,6 +321,7 @@ fn bear_trap(ecs: &mut World, x: i32, y: i32) {
             name: "Bear Trap".to_string(),
         })
         .with(EntryTrigger {})
+        .with(SingleActivation {})
         .with(InflictsDamage { damage: 6 })
         .marked::<SimpleMarker<SerializeMe>>()
         .build();
