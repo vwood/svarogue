@@ -481,7 +481,7 @@ fn main() -> rltk::BError {
         menu_selection: gui::MainMenuSelection::NewGame,
     });
     gs.ecs.insert(gamelog::GameLog {
-        entries: vec!["7DRL 2022".to_string()],
+        entries: vec!["SVAROGUE, 7DRL 2022".to_string()],
     });
 
     rltk::main_loop(context, gs)

@@ -504,11 +504,17 @@ pub fn main_menu(gs: &mut State, ctx: &mut Rltk) -> MainMenuResult {
 
     ctx.draw_box_double(
         26,
-        30,
+        29,
         27,
-        8,
+        9,
         RGB::named(rltk::WHEAT),
         RGB::named(rltk::BLACK),
+    );
+    ctx.print_color_centered(
+        31,
+        RGB::named(rltk::WHITE),
+        RGB::named(rltk::BLACK),
+        "SVAROGUE",
     );
     ctx.print_color_centered(
         32,
