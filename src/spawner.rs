@@ -2,7 +2,7 @@ use super::{
     map::MAPWIDTH, random_table::RandomTable, AreaOfEffect, BlocksTile, CombatStats, Confusion,
     Consumable, DefenseBonus, EntryTrigger, EquipmentSlot, Equippable, InflictsDamage, Item,
     MeleePowerBonus, Monster, Name, Player, Position, ProvidesHealing, Ranged, Rect, Renderable,
-    SerializeMe, Viewshed, SingleActivation,
+    SerializeMe, SingleActivation, Viewshed,
 };
 use rltk::{RandomNumberGenerator, RGB};
 use specs::prelude::*;

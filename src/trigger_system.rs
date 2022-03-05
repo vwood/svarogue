@@ -1,5 +1,6 @@
 use super::{
-    gamelog::GameLog, EntityMoved, EntryTrigger, InflictsDamage, Map, Name, Position, SufferDamage,
+    gamelog::GameLog, EntityMoved, EntryTrigger, InflictsDamage, Map, Name, Position,
+    SingleActivation, SufferDamage,
 };
 use specs::prelude::*;
 
@@ -17,6 +18,7 @@ impl<'a> System<'a> for TriggerSystem {
         WriteExpect<'a, GameLog>,
         ReadStorage<'a, InflictsDamage>,
         WriteStorage<'a, SufferDamage>,
+        ReadStorage<'a, SingleActivation>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
@@ -30,7 +32,10 @@ impl<'a> System<'a> for TriggerSystem {
             mut log,
             inflicts_damage,
             mut inflict_damage,
+            single_activation,
         ) = data;
+
+        let mut remove_entities: Vec<Entity> = Vec::new();
 
         for (entity, mut _entity_moved, pos) in (&entities, &mut entity_moved, &position).join() {
             let idx = map.xy_idx(pos.x, pos.y);
@@ -54,11 +59,24 @@ impl<'a> System<'a> for TriggerSystem {
                                     damage.damage,
                                 );
                             }
+
+                            let sa = single_activation.get(*entity_id);
+                            if let Some(_sa) = sa {
+                                remove_entities.push(*entity_id);
+                            }
                         }
                     }
                 }
             }
         }
+
+        for single_use in remove_entities.iter() {
+            entities
+                .delete(*single_use)
+                .expect("Unable to delete single use item");
+        }
+
+        // clear markers
         entity_moved.clear();
     }
 }

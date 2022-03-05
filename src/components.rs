@@ -143,7 +143,7 @@ pub struct EntityMoved {}
 
 #[derive(Component, Serialize, Deserialize, Clone)]
 pub struct ParticleLifetime {
-    pub lifetime_ms : f32
+    pub lifetime_ms: f32,
 }
 
 #[derive(PartialEq, Copy, Clone, Serialize, Deserialize)]
