@@ -49,6 +49,12 @@ pub struct CombatStats {
 }
 
 #[derive(Component, Debug, ConvertSaveload, Clone)]
+pub struct WeaponStats {
+    pub power: i32,
+    pub owner: Entity,
+}
+
+#[derive(Component, Debug, ConvertSaveload, Clone)]
 pub struct WantsToMelee {
     pub target: Entity,
 }
@@ -128,6 +134,12 @@ pub struct WantsToDropItem {
 pub struct WantsToRemoveItem {
     pub item: Entity,
 }
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct EntryTrigger {}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct EntityMoved {}
 
 #[derive(PartialEq, Copy, Clone, Serialize, Deserialize)]
 pub enum EquipmentSlot {
