@@ -48,14 +48,15 @@ fn room_table(map_depth: i32) -> RandomTable {
         .add("Goblin", 10)
         .add("Orc", 1 + map_depth)
         .add("Health Potion", 7)
-        .add("Fireball Scroll", 2 + map_depth)
-        .add("Confusion Scroll", 2 + map_depth)
-        .add("Magic Missile Scroll", 4)
+        // .add("Fireball Scroll", 2 + map_depth)
+        // .add("Confusion Scroll", 2 + map_depth)
+        // .add("Magic Missile Scroll", 4)
         .add("Dagger", 3)
         .add("Shield", 3)
-        .add("Longsword", map_depth - 1)
-        .add("Tower Shield", map_depth - 1)
-        .add("Bear Trap", 2)
+        .add("Longsword", map_depth)
+        .add("Halberd", map_depth)
+        // .add("Tower Shield", map_depth - 1)
+        .add("Bear Trap", 5)
 }
 
 /// Fills a room with stuff!
@@ -101,6 +102,7 @@ pub fn spawn_room(ecs: &mut World, room: &Rect, map_depth: i32) {
             "Dagger" => dagger(ecs, x, y),
             "Shield" => shield(ecs, x, y),
             "Longsword" => longsword(ecs, x, y),
+            "Halberd" => halberd(ecs, x, y),
             "Tower Shield" => tower_shield(ecs, x, y),
             "Bear Trap" => bear_trap(ecs, x, y),
             _ => {}
@@ -283,6 +285,27 @@ fn longsword(ecs: &mut World, x: i32, y: i32) {
             slot: EquipmentSlot::Melee,
         })
         .with(MeleePowerBonus { power: 4 })
+        .marked::<SimpleMarker<SerializeMe>>()
+        .build();
+}
+
+fn halberd(ecs: &mut World, x: i32, y: i32) {
+    ecs.create_entity()
+        .with(Position { x, y })
+        .with(Renderable {
+            glyph: rltk::to_cp437('/'),
+            fg: RGB::named(rltk::WHITE),
+            bg: RGB::named(rltk::BLACK),
+            render_order: 2,
+        })
+        .with(Name {
+            name: "Halberd".to_string(),
+        })
+        .with(Item {})
+        .with(Equippable {
+            slot: EquipmentSlot::Melee,
+        })
+        .with(MeleePowerBonus { power: 6 })
         .marked::<SimpleMarker<SerializeMe>>()
         .build();
 }

@@ -99,7 +99,7 @@ impl GameState for State {
 
         match newrunstate {
             RunState::MainMenu { .. } => {}
-            RunState::GameOver { .. } => {}
+            // RunState::GameOver { .. } => {}
             _ => {
                 draw_map(&self.ecs, ctx);
 
@@ -422,6 +422,11 @@ impl State {
         if let Some(vs) = vs {
             vs.dirty = true;
         }
+
+        // Clear gamelog
+        let mut gamelog = self.ecs.write_resource::<gamelog::GameLog>();
+        gamelog.entries.clear();
+        gamelog.entries.push("SVAROGUE, 7DRL 2022".to_string());
     }
 }
 

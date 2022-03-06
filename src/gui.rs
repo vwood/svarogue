@@ -641,11 +641,20 @@ pub enum GameOverResult {
 }
 
 pub fn game_over(ctx: &mut Rltk) -> GameOverResult {
+    ctx.draw_box(
+        10,
+        19,
+        60,
+        4,
+        RGB::named(rltk::BLACK),
+        RGB::named(rltk::BLACK),
+    );
+
     ctx.print_color_centered(
-        15,
+        21,
         RGB::named(rltk::RED),
         RGB::named(rltk::BLACK),
-        "YOU DIED",
+        "Y O U   D I E D",
     );
 
     match ctx.key {
