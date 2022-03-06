@@ -36,9 +36,7 @@ pub struct ParticleBuilder {
 impl ParticleBuilder {
     #[allow(clippy::new_without_default)]
     pub fn new() -> ParticleBuilder {
-        ParticleBuilder {
-            requests: Vec::new(),
-        }
+        ParticleBuilder { requests: Vec::new() }
     }
 
     pub fn request(
@@ -50,14 +48,8 @@ impl ParticleBuilder {
         glyph: rltk::FontCharType,
         lifetime: f32,
     ) {
-        self.requests.push(ParticleRequest {
-            x,
-            y,
-            fg,
-            bg,
-            glyph,
-            lifetime,
-        });
+        self.requests
+            .push(ParticleRequest { x, y, fg, bg, glyph, lifetime });
     }
 }
 

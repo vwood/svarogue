@@ -40,13 +40,8 @@ pub enum RunState {
     MonsterTurn,
     ShowInventory,
     ShowDropItem,
-    ShowTargeting {
-        range: i32,
-        item: Entity,
-    },
-    MainMenu {
-        menu_selection: gui::MainMenuSelection,
-    },
+    ShowTargeting { range: i32, item: Entity },
+    MainMenu { menu_selection: gui::MainMenuSelection },
     SaveGame,
     NextLevel,
     ShowRemoveItem,
@@ -160,10 +155,7 @@ impl GameState for State {
                             intent
                                 .insert(
                                     *self.ecs.fetch::<Entity>(),
-                                    WantsToUseItem {
-                                        item: item_entity,
-                                        target: None,
-                                    },
+                                    WantsToUseItem { item: item_entity, target: None },
                                 )
                                 .expect("Unable to insert intent");
                             newrunstate = RunState::PlayerTurn;
@@ -217,10 +209,7 @@ impl GameState for State {
                         intent
                             .insert(
                                 *self.ecs.fetch::<Entity>(),
-                                WantsToUseItem {
-                                    item,
-                                    target: result.1,
-                                },
+                                WantsToUseItem { item, target: result.1 },
                             )
                             .expect("Unable to insert intent");
                         newrunstate = RunState::PlayerTurn;
@@ -231,9 +220,7 @@ impl GameState for State {
                 let result = gui::main_menu(self, ctx);
                 match result {
                     gui::MainMenuResult::NoSelection { selected } => {
-                        newrunstate = RunState::MainMenu {
-                            menu_selection: selected,
-                        }
+                        newrunstate = RunState::MainMenu { menu_selection: selected }
                     }
                     gui::MainMenuResult::Selected { selected } => match selected {
                         gui::MainMenuSelection::NewGame => {

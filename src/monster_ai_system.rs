@@ -58,12 +58,7 @@ impl<'a> System<'a> for MonsterAI {
                     rltk::DistanceAlg::Pythagoras.distance2d(Point::new(pos.x, pos.y), *player_pos);
                 if distance < 1.5 {
                     wants_to_melee
-                        .insert(
-                            entity,
-                            WantsToMelee {
-                                target: *player_entity,
-                            },
-                        )
+                        .insert(entity, WantsToMelee { target: *player_entity })
                         .expect("Unable to insert attack");
                 } else if viewshed.visible_tiles.contains(&*player_pos) {
                     // Path to the player

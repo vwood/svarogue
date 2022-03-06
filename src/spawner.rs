@@ -12,10 +12,7 @@ use std::collections::HashMap;
 /// Spawns the player and returns his/her entity object.
 pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
     ecs.create_entity()
-        .with(Position {
-            x: player_x,
-            y: player_y,
-        })
+        .with(Position { x: player_x, y: player_y })
         .with(Renderable {
             glyph: rltk::to_cp437('@'),
             fg: RGB::named(rltk::YELLOW),
@@ -28,9 +25,7 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
             range: 8,
             dirty: true,
         })
-        .with(Name {
-            name: "Player".to_string(),
-        })
+        .with(Name { name: "Player".to_string() })
         .with(CombatStats {
             max_hp: 30,
             hp: 30,
@@ -51,11 +46,11 @@ fn room_table(map_depth: i32) -> RandomTable {
         // .add("Fireball Scroll", 2 + map_depth)
         // .add("Confusion Scroll", 2 + map_depth)
         // .add("Magic Missile Scroll", 4)
-        .add("Dagger", 3)
+        .add("Dagger", 3 * 2)
         .add("Shield", 3)
-        .add("Longsword", map_depth)
-        .add("Halberd", map_depth)
-        // .add("Tower Shield", map_depth - 1)
+        .add("Longsword", map_depth * 2)
+        .add("Halberd", map_depth * 2)
+        .add("Tower Shield", map_depth * 2)
         .add("Bear Trap", 5)
 }
 
@@ -132,9 +127,7 @@ fn monster<S: ToString>(ecs: &mut World, x: i32, y: i32, glyph: rltk::FontCharTy
             dirty: true,
         })
         .with(Monster {})
-        .with(Name {
-            name: name.to_string(),
-        })
+        .with(Name { name: name.to_string() })
         .with(BlocksTile {})
         .with(CombatStats {
             max_hp: 16,
@@ -235,13 +228,9 @@ fn dagger(ecs: &mut World, x: i32, y: i32) {
             bg: RGB::named(rltk::BLACK),
             render_order: 2,
         })
-        .with(Name {
-            name: "Dagger".to_string(),
-        })
+        .with(Name { name: "Dagger".to_string() })
         .with(Item {})
-        .with(Equippable {
-            slot: EquipmentSlot::Melee,
-        })
+        .with(Equippable { slot: EquipmentSlot::Melee })
         .with(MeleePowerBonus { power: 2 })
         .marked::<SimpleMarker<SerializeMe>>()
         .build();
@@ -256,13 +245,9 @@ fn shield(ecs: &mut World, x: i32, y: i32) {
             bg: RGB::named(rltk::BLACK),
             render_order: 2,
         })
-        .with(Name {
-            name: "Shield".to_string(),
-        })
+        .with(Name { name: "Shield".to_string() })
         .with(Item {})
-        .with(Equippable {
-            slot: EquipmentSlot::Shield,
-        })
+        .with(Equippable { slot: EquipmentSlot::Shield })
         .with(DefenseBonus { defense: 1 })
         .marked::<SimpleMarker<SerializeMe>>()
         .build();
@@ -277,13 +262,9 @@ fn longsword(ecs: &mut World, x: i32, y: i32) {
             bg: RGB::named(rltk::BLACK),
             render_order: 2,
         })
-        .with(Name {
-            name: "Longsword".to_string(),
-        })
+        .with(Name { name: "Longsword".to_string() })
         .with(Item {})
-        .with(Equippable {
-            slot: EquipmentSlot::Melee,
-        })
+        .with(Equippable { slot: EquipmentSlot::Melee })
         .with(MeleePowerBonus { power: 4 })
         .marked::<SimpleMarker<SerializeMe>>()
         .build();
@@ -298,13 +279,9 @@ fn halberd(ecs: &mut World, x: i32, y: i32) {
             bg: RGB::named(rltk::BLACK),
             render_order: 2,
         })
-        .with(Name {
-            name: "Halberd".to_string(),
-        })
+        .with(Name { name: "Halberd".to_string() })
         .with(Item {})
-        .with(Equippable {
-            slot: EquipmentSlot::Melee,
-        })
+        .with(Equippable { slot: EquipmentSlot::Melee })
         .with(MeleePowerBonus { power: 6 })
         .marked::<SimpleMarker<SerializeMe>>()
         .build();
@@ -319,13 +296,9 @@ fn tower_shield(ecs: &mut World, x: i32, y: i32) {
             bg: RGB::named(rltk::BLACK),
             render_order: 2,
         })
-        .with(Name {
-            name: "Tower Shield".to_string(),
-        })
+        .with(Name { name: "Tower Shield".to_string() })
         .with(Item {})
-        .with(Equippable {
-            slot: EquipmentSlot::Shield,
-        })
+        .with(Equippable { slot: EquipmentSlot::Shield })
         .with(DefenseBonus { defense: 3 })
         .marked::<SimpleMarker<SerializeMe>>()
         .build();
@@ -340,9 +313,7 @@ fn bear_trap(ecs: &mut World, x: i32, y: i32) {
             bg: RGB::named(rltk::BLACK),
             render_order: 2,
         })
-        .with(Name {
-            name: "Bear Trap".to_string(),
-        })
+        .with(Name { name: "Bear Trap".to_string() })
         .with(EntryTrigger {})
         .with(SingleActivation {})
         .with(InflictsDamage { damage: 6 })

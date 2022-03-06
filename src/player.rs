@@ -32,12 +32,7 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
             let target = combat_stats.get(*potential_target);
             if let Some(_target) = target {
                 wants_to_melee
-                    .insert(
-                        entity,
-                        WantsToMelee {
-                            target: *potential_target,
-                        },
-                    )
+                    .insert(entity, WantsToMelee { target: *potential_target })
                     .expect("Add target failed");
                 return;
             }

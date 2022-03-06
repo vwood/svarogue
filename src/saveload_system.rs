@@ -37,10 +37,7 @@ pub fn save_game(ecs: &mut World) {
 
     // Actually serialize
     {
-        let data = (
-            ecs.entities(),
-            ecs.read_storage::<SimpleMarker<SerializeMe>>(),
-        );
+        let data = (ecs.entities(), ecs.read_storage::<SimpleMarker<SerializeMe>>());
 
         let writer = File::create("./savegame.json").unwrap();
         let mut serializer = serde_json::Serializer::new(writer);

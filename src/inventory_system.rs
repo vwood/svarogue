@@ -25,19 +25,13 @@ impl<'a> System<'a> for ItemCollectionSystem {
         for pickup in wants_pickup.join() {
             positions.remove(pickup.item);
             backpack
-                .insert(
-                    pickup.item,
-                    InBackpack {
-                        owner: pickup.collected_by,
-                    },
-                )
+                .insert(pickup.item, InBackpack { owner: pickup.collected_by })
                 .expect("Unable to insert backpack entry");
 
             if pickup.collected_by == *player_entity {
-                gamelog.entries.push(format!(
-                    "You pick up the {}.",
-                    names.get(pickup.item).unwrap().name
-                ));
+                gamelog
+                    .entries
+                    .push(format!("You pick up the {}.", names.get(pickup.item).unwrap().name));
             }
         }
 
@@ -156,20 +150,13 @@ impl<'a> System<'a> for ItemUseSystem {
 
                     // Wield the item
                     equipped
-                        .insert(
-                            useitem.item,
-                            Equipped {
-                                owner: target,
-                                slot: target_slot,
-                            },
-                        )
+                        .insert(useitem.item, Equipped { owner: target, slot: target_slot })
                         .expect("Unable to insert equipped component");
                     backpack.remove(useitem.item);
                     if target == *player_entity {
-                        gamelog.entries.push(format!(
-                            "You equip {}.",
-                            names.get(useitem.item).unwrap().name
-                        ));
+                        gamelog
+                            .entries
+                            .push(format!("You equip {}.", names.get(useitem.item).unwrap().name));
                     }
                 }
             }
@@ -307,10 +294,9 @@ impl<'a> System<'a> for ItemDropSystem {
             backpack.remove(to_drop.item);
 
             if entity == *player_entity {
-                gamelog.entries.push(format!(
-                    "You drop the {}.",
-                    names.get(to_drop.item).unwrap().name
-                ));
+                gamelog
+                    .entries
+                    .push(format!("You drop the {}.", names.get(to_drop.item).unwrap().name));
             }
         }
 
