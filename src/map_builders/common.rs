@@ -56,4 +56,3 @@ pub fn apply_point(map: &mut Map, x: i32, y: i32) {
         map.tiles[idx as usize] = TileType::Floor;
     }
 }
-

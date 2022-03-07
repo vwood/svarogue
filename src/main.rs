@@ -81,10 +81,10 @@ impl State {
         self.ecs.maintain();
     }
 
-    fn generate_world_map(&mut self, new_depth : i32) {
+    fn generate_world_map(&mut self, new_depth: i32) {
         let mut builder = map_builders::random_builder(new_depth);
         builder.build_map();
-        
+
         let player_start;
         {
             let mut worldmap_resource = self.ecs.write_resource::<Map>();
@@ -372,7 +372,8 @@ impl State {
         let mut player_health_store = self.ecs.write_storage::<CombatStats>();
         let player_health = player_health_store.get_mut(*player_entity);
         if let Some(player_health) = player_health {
-            player_health.hp = i32::min(player_health.max_hp, player_health.hp + player_health.max_hp / 2);
+            player_health.hp =
+                i32::min(player_health.max_hp, player_health.hp + player_health.max_hp / 2);
         }
     }
 
@@ -392,7 +393,7 @@ impl State {
             let mut player_entity_writer = self.ecs.write_resource::<Entity>();
             *player_entity_writer = player_entity;
         }
-        
+
         self.generate_world_map(1);
         // Clear gamelog
         let mut gamelog = self.ecs.write_resource::<gamelog::GameLog>();
@@ -447,7 +448,7 @@ fn main() -> rltk::BError {
     gs.ecs.insert(Map::new(1));
     gs.ecs.insert(Point::new(0, 0));
     gs.ecs.insert(rltk::RandomNumberGenerator::new());
-    
+
     let player_entity = spawner::player(&mut gs.ecs, 0, 0);
     gs.ecs.insert(player_entity);
 
@@ -459,6 +460,6 @@ fn main() -> rltk::BError {
     });
 
     gs.generate_world_map(1);
-    
+
     rltk::main_loop(context, gs)
 }

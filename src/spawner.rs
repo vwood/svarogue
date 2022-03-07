@@ -86,22 +86,45 @@ pub fn spawn_room(ecs: &mut World, room: &Rect, map_depth: i32) {
     for spawn in spawn_points.iter() {
         let x = (*spawn.0 % MAPWIDTH) as i32;
         let y = (*spawn.0 / MAPWIDTH) as i32;
+        spawn_item(ecs, x, y, spawn.1);
+    }
+}
 
-        match spawn.1.as_ref() {
-            "Goblin" => goblin(ecs, x, y),
-            "Orc" => orc(ecs, x, y),
-            "Health Potion" => health_potion(ecs, x, y),
-            "Fireball Scroll" => fireball_scroll(ecs, x, y),
-            "Confusion Scroll" => confusion_scroll(ecs, x, y),
-            "Magic Missile Scroll" => magic_missile_scroll(ecs, x, y),
-            "Dagger" => dagger(ecs, x, y),
-            "Shield" => shield(ecs, x, y),
-            "Longsword" => longsword(ecs, x, y),
-            "Halberd" => halberd(ecs, x, y),
-            "Tower Shield" => tower_shield(ecs, x, y),
-            "Bear Trap" => bear_trap(ecs, x, y),
-            _ => {}
+fn spawn_item(ecs: &mut World, x: i32, y: i32, item: &str) {
+    match item.as_ref() {
+        "Goblin" => goblin(ecs, x, y),
+        "Orc" => orc(ecs, x, y),
+        "Health Potion" => health_potion(ecs, x, y),
+        "Fireball Scroll" => fireball_scroll(ecs, x, y),
+        "Confusion Scroll" => confusion_scroll(ecs, x, y),
+        "Magic Missile Scroll" => magic_missile_scroll(ecs, x, y),
+        "Dagger" => dagger(ecs, x, y),
+        "Shield" => shield(ecs, x, y),
+        "Longsword" => longsword(ecs, x, y),
+        "Halberd" => halberd(ecs, x, y),
+        "Tower Shield" => tower_shield(ecs, x, y),
+        "Bear Trap" => bear_trap(ecs, x, y),
+        _ => {}
+    }
+}
+
+pub fn spawn_locations(ecs: &mut World, positions: &[Position], map_depth: i32) {
+    let spawn_table = room_table(map_depth);
+    let mut spawn_points: HashMap<usize, String> = HashMap::new();
+
+    {
+        let mut rng = ecs.write_resource::<RandomNumberGenerator>();
+
+        for position in positions {
+            let idx = (position.y as usize * MAPWIDTH) + position.x as usize;
+            spawn_points.insert(idx, spawn_table.roll(&mut rng));
         }
+    }
+
+    for spawn in spawn_points.iter() {
+        let x = (*spawn.0 % MAPWIDTH) as i32;
+        let y = (*spawn.0 / MAPWIDTH) as i32;
+        spawn_item(ecs, x, y, spawn.1);
     }
 }
 

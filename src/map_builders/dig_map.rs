@@ -1,15 +1,12 @@
-use super::{
-    apply_point, spawner, Map, MapBuilder,
-    Position, Rect, TileType,
-};
+use super::{apply_point, spawner, Map, MapBuilder, Position, TileType};
+use noise::{Fbm, NoiseFn, Seedable};
 use rltk::RandomNumberGenerator;
 use specs::prelude::*;
-use std::collections::BinaryHeap;
-use noise::{Fbm, NoiseFn, Seedable};
 use std::cmp::Ordering;
+use std::collections::BinaryHeap;
 
 /*
-   Open question how to replace rooms... 
+   Open question how to replace rooms...
 
    Could segment, create a list of potential spawn locations as we dig...
 
@@ -37,11 +34,7 @@ impl MapBuilder for DigMapBuilder {
     }
 
     fn spawn_entities(&mut self, ecs: &mut World) {
-        // TODO: solve this later
-        
-        // for room in self.rooms.iter().skip(1) {
-        //    spawner::spawn_room(ecs, room, self.depth);
-        // }
+        spawner::spawn_locations(ecs, &self.spawn_candidates[..], self.depth);
     }
 }
 
@@ -90,9 +83,9 @@ impl DigMapBuilder {
     }
 
     fn dig_map(&mut self) {
-        const CONSTANT : f64 = -0.1;
-        const EDGE_WEIGHT : f64 = 2.5;
-        
+        const CONSTANT: f64 = -0.1;
+        const EDGE_WEIGHT: f64 = 2.5;
+
         let (w, h) = (self.map.width, self.map.height);
         let iterations = (w * h) / 2;
 
@@ -103,7 +96,6 @@ impl DigMapBuilder {
         let start_x = rng.range(0, w / 2) as i32 + w / 4;
         let start_y = rng.range(0, h / 2) as i32 + h / 4;
 
-        
         heap.push(Location {
             score: 0.0,
             x: start_x,
@@ -125,15 +117,16 @@ impl DigMapBuilder {
                 count += 1;
                 visited[x as usize][y as usize] = 1;
 
-                if count % 10 == 0 {
-                    self.spawn_candidates.push(Position{ x: x, y: y});
+                if count % 40 == 0 {
+                    self.spawn_candidates.push(Position { x: x, y: y });
                 }
-                
+
                 let (fx, fy) = (x as f64 * dx, y as f64 * dy);
 
                 if x > 0 && visited[x as usize - 1][y as usize] == 0 {
                     heap.push(Location {
-                        score: score + (simplex.get([fx - dx, fy]) + CONSTANT)
+                        score: score
+                            + (simplex.get([fx - dx, fy]) + CONSTANT)
                             + EDGE_WEIGHT * distance_to_centre(x, y, w, h),
                         x: x - 1,
                         y: y,
@@ -142,7 +135,8 @@ impl DigMapBuilder {
 
                 if x < w - 1 && visited[x as usize + 1][y as usize] == 0 {
                     heap.push(Location {
-                        score: score + (simplex.get([fx + dx, fy]) + CONSTANT)
+                        score: score
+                            + (simplex.get([fx + dx, fy]) + CONSTANT)
                             + EDGE_WEIGHT * distance_to_centre(x, y, w, h),
                         x: x + 1,
                         y: y,
@@ -151,7 +145,8 @@ impl DigMapBuilder {
 
                 if y > 0 && visited[x as usize][y as usize - 1] == 0 {
                     heap.push(Location {
-                        score: score + (simplex.get([fx, fy - dy]) + CONSTANT)
+                        score: score
+                            + (simplex.get([fx, fy - dy]) + CONSTANT)
                             + EDGE_WEIGHT * distance_to_centre(x, y, w, h),
                         x: x,
                         y: y - 1,
@@ -160,7 +155,8 @@ impl DigMapBuilder {
 
                 if y < h - 1 && visited[x as usize][y as usize + 1] == 0 {
                     heap.push(Location {
-                        score: score + (simplex.get([fx, fy + dy]) + CONSTANT)
+                        score: score
+                            + (simplex.get([fx, fy + dy]) + CONSTANT)
                             + EDGE_WEIGHT * distance_to_centre(x, y, w, h),
                         x: x,
                         y: y + 1,
@@ -175,6 +171,6 @@ impl DigMapBuilder {
         let stairs_idx = self.map.xy_idx(stairs_position.x, stairs_position.y);
         self.map.tiles[stairs_idx] = TileType::DownStairs;
 
-        self.starting_position = Position{ x: start_x, y: start_y};
+        self.starting_position = Position { x: start_x, y: start_y };
     }
 }
