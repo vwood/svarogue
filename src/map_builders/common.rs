@@ -49,3 +49,11 @@ pub fn apply_vertical_tunnel(map: &mut Map, y1: i32, y2: i32, x: i32) {
         }
     }
 }
+
+pub fn apply_point(map: &mut Map, x: i32, y: i32) {
+    let idx = map.xy_idx(x, y);
+    if idx > 0 && idx < map.width as usize * map.height as usize {
+        map.tiles[idx as usize] = TileType::Floor;
+    }
+}
+
