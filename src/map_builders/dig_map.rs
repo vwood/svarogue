@@ -5,7 +5,7 @@ use super::{
 use rltk::RandomNumberGenerator;
 use specs::prelude::*;
 use std::collections::BinaryHeap;
-use noise::{Fbm, NoiseFn};
+use noise::{Fbm, NoiseFn, Seedable};
 use std::cmp::Ordering;
 
 /*
@@ -37,6 +37,8 @@ impl MapBuilder for DigMapBuilder {
     }
 
     fn spawn_entities(&mut self, ecs: &mut World) {
+        // TODO: solve this later
+        
         // for room in self.rooms.iter().skip(1) {
         //    spawner::spawn_room(ecs, room, self.depth);
         // }
@@ -73,6 +75,10 @@ impl PartialOrd for Location {
     }
 }
 
+fn distance_to_centre(x: i32, y: i32, w: i32, h: i32) -> f64 {
+    ((x - w / 2) as f64 / w as f64).powf(2.0) + ((y - h / 2) as f64 / h as f64).powf(2.0)
+}
+
 impl DigMapBuilder {
     pub fn new(new_depth: i32) -> DigMapBuilder {
         DigMapBuilder {
@@ -84,14 +90,14 @@ impl DigMapBuilder {
     }
 
     fn dig_map(&mut self) {
-        const POWER : f64 = 2.0;
-        const CONSTANT : f64 = 0.1;
+        const CONSTANT : f64 = -0.1;
+        const EDGE_WEIGHT : f64 = 2.5;
         
         let (w, h) = (self.map.width, self.map.height);
-        let iterations = (w * h) / 3;
-        
+        let iterations = (w * h) / 2;
+
         let mut rng = RandomNumberGenerator::new();
-        let simplex = Fbm::default();
+        let simplex = Fbm::new().set_seed(rng.range(0, u32::MAX) as u32);
         let mut heap = BinaryHeap::new();
 
         let start_x = rng.range(0, w / 2) as i32 + w / 4;
@@ -107,7 +113,7 @@ impl DigMapBuilder {
         let mut visited = vec![vec![0u8; h as usize]; w as usize];
 
         // constants for scaling the noise
-        let (dx, dy) = (5.0 / w as f64, 5.0 / h as f64);
+        let (dx, dy) = (8.0 / w as f64, 8.0 / h as f64);
 
         let mut count = 0;
         for _ in 0..iterations {
@@ -127,7 +133,8 @@ impl DigMapBuilder {
 
                 if x > 0 && visited[x as usize - 1][y as usize] == 0 {
                     heap.push(Location {
-                        score: score + (simplex.get([fx - dx, fy]) + CONSTANT), // .powf(POWER),
+                        score: score + (simplex.get([fx - dx, fy]) + CONSTANT)
+                            + EDGE_WEIGHT * distance_to_centre(x, y, w, h),
                         x: x - 1,
                         y: y,
                     });
@@ -135,7 +142,8 @@ impl DigMapBuilder {
 
                 if x < w - 1 && visited[x as usize + 1][y as usize] == 0 {
                     heap.push(Location {
-                        score: score + (simplex.get([fx + dx, fy]) + CONSTANT), // .powf(POWER),
+                        score: score + (simplex.get([fx + dx, fy]) + CONSTANT)
+                            + EDGE_WEIGHT * distance_to_centre(x, y, w, h),
                         x: x + 1,
                         y: y,
                     });
@@ -143,7 +151,8 @@ impl DigMapBuilder {
 
                 if y > 0 && visited[x as usize][y as usize - 1] == 0 {
                     heap.push(Location {
-                        score: score + (simplex.get([fx, fy - dy]) + CONSTANT), // .powf(POWER),
+                        score: score + (simplex.get([fx, fy - dy]) + CONSTANT)
+                            + EDGE_WEIGHT * distance_to_centre(x, y, w, h),
                         x: x,
                         y: y - 1,
                     });
@@ -151,7 +160,8 @@ impl DigMapBuilder {
 
                 if y < h - 1 && visited[x as usize][y as usize + 1] == 0 {
                     heap.push(Location {
-                        score: score + (simplex.get([fx, fy + dy]) + CONSTANT), // .powf(POWER),
+                        score: score + (simplex.get([fx, fy + dy]) + CONSTANT)
+                            + EDGE_WEIGHT * distance_to_centre(x, y, w, h),
                         x: x,
                         y: y + 1,
                     });
