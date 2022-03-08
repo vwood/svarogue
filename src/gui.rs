@@ -24,6 +24,18 @@ pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
             RGB::named(rltk::RED),
             RGB::named(rltk::BLACK),
         );
+        let stamina = format!(" SP: {} / {} ", stats.stamina, stats.max_stamina);
+        ctx.print_color(12, 44, RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK), &stamina);
+
+        ctx.draw_bar_horizontal(
+            28,
+            44,
+            51,
+            stats.stamina,
+            stats.max_stamina,
+            RGB::named(rltk::BLUE),
+            RGB::named(rltk::BLACK),
+        );
     }
 
     let map = ecs.fetch::<Map>();
@@ -31,12 +43,12 @@ pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
     ctx.print_color(2, 43, RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK), &depth);
 
     let log = ecs.fetch::<GameLog>();
-    let mut y = 44;
+    let mut y = 49;
     for s in log.entries.iter().rev() {
-        if y < 49 {
-            ctx.print(2, y, s);
+        if y > 44 {
+            ctx.print_color(2, y, RGB::named(rltk::GRAY), (40, 0, 0), s);
         }
-        y += 1;
+        y -= 1;
     }
 
     // Draw mouse cursor

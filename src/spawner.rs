@@ -22,7 +22,14 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
         .with(Player {})
         .with(Viewshed { visible_tiles: Vec::new(), range: 8, dirty: true })
         .with(Name { name: "Player".to_string() })
-        .with(CombatStats { max_hp: 30, hp: 30, defense: 2, power: 5 })
+        .with(CombatStats {
+            max_hp: 30,
+            hp: 30,
+            stamina: 10,
+            max_stamina: 10,
+            defense: 2,
+            power: 5,
+        })
         .with(Attributes {
             strength: Attribute { base: 10, modifiers: 0, bonus: 0 },
             dexterity: Attribute { base: 10, modifiers: 0, bonus: 0 },
@@ -144,7 +151,14 @@ fn monster<S: ToString>(ecs: &mut World, x: i32, y: i32, glyph: rltk::FontCharTy
         .with(Monster {})
         .with(Name { name: name.to_string() })
         .with(BlocksTile {})
-        .with(CombatStats { max_hp: 16, hp: 16, defense: 1, power: 4 })
+        .with(CombatStats {
+            max_hp: 16,
+            hp: 16,
+            stamina: 2,
+            max_stamina: 2,
+            defense: 1,
+            power: 4,
+        })
         .marked::<SimpleMarker<SerializeMe>>()
         .build();
 }

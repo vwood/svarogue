@@ -118,11 +118,12 @@ fn skip_turn(ecs: &mut World) -> RunState {
         }
     }
 
+    let mut health_components = ecs.write_storage::<CombatStats>();
+    let player_stats = health_components.get_mut(*player_entity).unwrap();
     if can_heal {
-        let mut health_components = ecs.write_storage::<CombatStats>();
-        let player_hp = health_components.get_mut(*player_entity).unwrap();
-        player_hp.hp = i32::min(player_hp.hp + 1, player_hp.max_hp);
+        player_stats.hp = i32::min(player_stats.hp + 1, player_stats.max_hp);
     }
+    player_stats.stamina = i32::min(player_stats.stamina + 1, player_stats.max_stamina);
 
     RunState::PlayerTurn
 }
@@ -187,36 +188,85 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
     RunState::PlayerTurn
 }
 
+fn player_use_stamina(ecs: &mut World, amount: i32) -> bool {
+    let mut gamelog = ecs.fetch_mut::<GameLog>();
+    gamelog.entries.push("You exert yourself.".to_string());
+
+    let player_entity = ecs.fetch::<Entity>();
+    let mut combat_stats = ecs.write_storage::<CombatStats>();
+    let player_stats = combat_stats.get_mut(*player_entity).unwrap();
+
+    if player_stats.stamina < amount {
+        false
+    } else {
+        player_stats.stamina = player_stats.stamina - amount;
+        true
+    }
+}
+
 pub fn player_dodge_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
     // Player movement - dodge mode
     match ctx.key {
-        None => return RunState::AwaitingInput, // Nothing happened
+        None => return RunState::Dodge, // Nothing happened
         Some(key) => match key {
             VirtualKeyCode::Left | VirtualKeyCode::Numpad4 | VirtualKeyCode::H => {
-                try_move_player(-1, 0, &mut gs.ecs)
+                if player_use_stamina(&mut gs.ecs, 1) {
+                    try_move_player(-1, 0, &mut gs.ecs);
+                    try_move_player(-1, 0, &mut gs.ecs);
+                }
             }
 
             VirtualKeyCode::Right | VirtualKeyCode::Numpad6 | VirtualKeyCode::L => {
-                try_move_player(1, 0, &mut gs.ecs)
+                if player_use_stamina(&mut gs.ecs, 1) {
+                    try_move_player(1, 0, &mut gs.ecs);
+                    try_move_player(1, 0, &mut gs.ecs);
+                }
             }
 
             VirtualKeyCode::Up | VirtualKeyCode::Numpad8 | VirtualKeyCode::K => {
-                try_move_player(0, -1, &mut gs.ecs)
+                if player_use_stamina(&mut gs.ecs, 1) {
+                    try_move_player(0, -1, &mut gs.ecs);
+                    try_move_player(0, -1, &mut gs.ecs);
+                }
             }
 
             VirtualKeyCode::Down | VirtualKeyCode::Numpad2 | VirtualKeyCode::J => {
-                try_move_player(0, 1, &mut gs.ecs)
+                if player_use_stamina(&mut gs.ecs, 1) {
+                    try_move_player(0, 1, &mut gs.ecs);
+                    try_move_player(0, 1, &mut gs.ecs);
+                }
             }
 
             // Diagonals
-            VirtualKeyCode::Numpad9 | VirtualKeyCode::U => try_move_player(1, -1, &mut gs.ecs),
+            VirtualKeyCode::Numpad9 | VirtualKeyCode::U => {
+                if player_use_stamina(&mut gs.ecs, 1) {
+                    try_move_player(1, -1, &mut gs.ecs);
+                    try_move_player(1, -1, &mut gs.ecs);
+                }
+            }
 
-            VirtualKeyCode::Numpad7 | VirtualKeyCode::Y => try_move_player(-1, -1, &mut gs.ecs),
+            VirtualKeyCode::Numpad7 | VirtualKeyCode::Y => {
+                if player_use_stamina(&mut gs.ecs, 1) {
+                    try_move_player(-1, -1, &mut gs.ecs);
+                    try_move_player(-1, -1, &mut gs.ecs);
+                }
+            }
 
-            VirtualKeyCode::Numpad3 | VirtualKeyCode::N => try_move_player(1, 1, &mut gs.ecs),
+            VirtualKeyCode::Numpad3 | VirtualKeyCode::N => {
+                if player_use_stamina(&mut gs.ecs, 1) {
+                    try_move_player(1, 1, &mut gs.ecs);
+                    try_move_player(1, 1, &mut gs.ecs);
+                }
+            }
 
-            VirtualKeyCode::Numpad1 | VirtualKeyCode::B => try_move_player(-1, 1, &mut gs.ecs),
+            VirtualKeyCode::Numpad1 | VirtualKeyCode::B => {
+                if player_use_stamina(&mut gs.ecs, 1) {
+                    try_move_player(-1, 1, &mut gs.ecs);
+                    try_move_player(-1, 1, &mut gs.ecs);
+                }
+            }
 
+            // can still skip Turn
             VirtualKeyCode::Numpad5 | VirtualKeyCode::Space => return skip_turn(&mut gs.ecs),
 
             // Might as well accept these too
@@ -225,9 +275,10 @@ pub fn player_dodge_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
             VirtualKeyCode::Z => return RunState::Dodge,
 
             // Escape dodge mode
-            // VirtualKeyCode::Escape => return RunState::AwaitingInput,
-            _ => return RunState::AwaitingInput,
+            VirtualKeyCode::Escape => return RunState::AwaitingInput,
+            _ => return RunState::Dodge,
         },
     }
+
     RunState::PlayerTurn
 }

@@ -307,7 +307,7 @@ impl GameState for State {
                 // newrunstate = RunState::PreRun;
             }
             RunState::Dodge => {
-                newrunstate = player_input(self, ctx);
+                newrunstate = player_dodge_input(self, ctx);
                 // newrunstate = RunState::PreRun;
             }
         }
