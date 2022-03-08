@@ -47,6 +47,9 @@ pub enum RunState {
     NextLevel,
     ShowRemoveItem,
     GameOver,
+    MoveWeapon,
+    MoveShield,
+    Dodge,
 }
 
 pub struct State {
@@ -279,20 +282,29 @@ impl GameState for State {
                     gui::GameOverResult::NoSelection => {}
                     gui::GameOverResult::QuitToMenu => {
                         self.game_over_cleanup();
-                        newrunstate = RunState::MainMenu {
-                            menu_selection: gui::MainMenuSelection::NewGame,
-                        };
+                        newrunstate =
+                            RunState::MainMenu { menu_selection: gui::MainMenuSelection::NewGame };
                     }
                 }
             }
             RunState::SaveGame => {
                 saveload_system::save_game(&mut self.ecs);
-                newrunstate = RunState::MainMenu {
-                    menu_selection: gui::MainMenuSelection::LoadGame,
-                };
+                newrunstate =
+                    RunState::MainMenu { menu_selection: gui::MainMenuSelection::LoadGame };
             }
             RunState::NextLevel => {
                 self.goto_next_level();
+                newrunstate = RunState::PreRun;
+            }
+
+            // TODO: this
+            RunState::MoveWeapon => {
+                newrunstate = RunState::PreRun;
+            }
+            RunState::MoveShield => {
+                newrunstate = RunState::PreRun;
+            }
+            RunState::Dodge => {
                 newrunstate = RunState::PreRun;
             }
         }
@@ -449,6 +461,7 @@ fn main() -> rltk::BError {
     gs.ecs.register::<EntryTrigger>();
     gs.ecs.register::<EntityMoved>();
     gs.ecs.register::<SingleActivation>();
+    gs.ecs.register::<Attributes>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
     gs.ecs.insert(particle_system::ParticleBuilder::new());
@@ -461,12 +474,10 @@ fn main() -> rltk::BError {
     let player_entity = spawner::player(&mut gs.ecs, 0, 0);
     gs.ecs.insert(player_entity);
 
-    gs.ecs.insert(RunState::MainMenu {
-        menu_selection: gui::MainMenuSelection::NewGame,
-    });
-    gs.ecs.insert(gamelog::GameLog {
-        entries: vec!["SVAROGUE, 7DRL 2022".to_string()],
-    });
+    gs.ecs
+        .insert(RunState::MainMenu { menu_selection: gui::MainMenuSelection::NewGame });
+    gs.ecs
+        .insert(gamelog::GameLog { entries: vec!["SVAROGUE, 7DRL 2022".to_string()] });
 
     gs.generate_world_map(1);
 

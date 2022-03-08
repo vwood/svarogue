@@ -6,7 +6,7 @@ use rltk::{Point, Rltk, VirtualKeyCode, RGB};
 use specs::prelude::*;
 
 pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
-    ctx.draw_box(0, 43, 79, 6, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK));
+    ctx.draw_box(0, 43, 79, 6, RGB::named(rltk::BLACK), RGB::named(rltk::BLACK));
 
     let combat_stats = ecs.read_storage::<CombatStats>();
     let players = ecs.read_storage::<Player>();
@@ -463,9 +463,7 @@ pub fn main_menu(gs: &mut State, ctx: &mut Rltk) -> MainMenuResult {
             None => return MainMenuResult::NoSelection { selected: selection },
             Some(key) => match key {
                 VirtualKeyCode::Escape => {
-                    return MainMenuResult::NoSelection {
-                        selected: MainMenuSelection::Quit,
-                    }
+                    return MainMenuResult::NoSelection { selected: MainMenuSelection::Quit }
                 }
                 VirtualKeyCode::K | VirtualKeyCode::Up => {
                     let mut newselection;
@@ -497,9 +495,7 @@ pub fn main_menu(gs: &mut State, ctx: &mut Rltk) -> MainMenuResult {
         }
     }
 
-    MainMenuResult::NoSelection {
-        selected: MainMenuSelection::NewGame,
-    }
+    MainMenuResult::NoSelection { selected: MainMenuSelection::NewGame }
 }
 
 #[derive(PartialEq, Copy, Clone)]

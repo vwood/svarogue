@@ -184,3 +184,17 @@ pub struct SerializeMe;
 pub struct SerializationHelper {
     pub map: super::map::Map,
 }
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Attribute {
+    pub base: i32,
+    pub modifiers: i32,
+    pub bonus: i32,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Attributes {
+    pub strength: Attribute,
+    pub dexterity: Attribute,
+    pub endurance: Attribute,
+}

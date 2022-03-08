@@ -71,13 +71,7 @@ impl<'a> System<'a> for ParticleSpawnSystem {
         for new_particle in particle_builder.requests.iter() {
             let p = entities.create();
             positions
-                .insert(
-                    p,
-                    Position {
-                        x: new_particle.x,
-                        y: new_particle.y,
-                    },
-                )
+                .insert(p, Position { x: new_particle.x, y: new_particle.y })
                 .expect("Unable to insert position");
             renderables
                 .insert(
@@ -91,12 +85,7 @@ impl<'a> System<'a> for ParticleSpawnSystem {
                 )
                 .expect("Unable to insert renderable");
             particles
-                .insert(
-                    p,
-                    ParticleLifetime {
-                        lifetime_ms: new_particle.lifetime,
-                    },
-                )
+                .insert(p, ParticleLifetime { lifetime_ms: new_particle.lifetime })
                 .expect("Unable to insert lifetime");
         }
 

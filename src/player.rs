@@ -90,13 +90,7 @@ fn get_item(ecs: &mut World) {
         Some(item) => {
             let mut pickup = ecs.write_storage::<WantsToPickupItem>();
             pickup
-                .insert(
-                    *player_entity,
-                    WantsToPickupItem {
-                        collected_by: *player_entity,
-                        item,
-                    },
-                )
+                .insert(*player_entity, WantsToPickupItem { collected_by: *player_entity, item })
                 .expect("Unable to insert want to pickup");
         }
     }
@@ -178,6 +172,11 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
             VirtualKeyCode::I => return RunState::ShowInventory,
             VirtualKeyCode::D => return RunState::ShowDropItem,
             VirtualKeyCode::R => return RunState::ShowRemoveItem,
+
+            // Moving weapons
+            VirtualKeyCode::A => return RunState::MoveWeapon,
+            VirtualKeyCode::S => return RunState::MoveShield,
+            VirtualKeyCode::Z => return RunState::Dodge,
 
             // Save and Quit
             VirtualKeyCode::Escape => return RunState::SaveGame,

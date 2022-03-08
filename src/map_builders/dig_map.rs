@@ -96,11 +96,7 @@ impl DigMapBuilder {
         let start_x = rng.range(0, w / 2) as i32 + w / 4;
         let start_y = rng.range(0, h / 2) as i32 + h / 4;
 
-        heap.push(Location {
-            score: 0.0,
-            x: start_x,
-            y: start_y,
-        });
+        heap.push(Location { score: 0.0, x: start_x, y: start_y });
 
         let mut visited = vec![vec![0u8; h as usize]; w as usize];
 

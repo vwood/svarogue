@@ -12,9 +12,9 @@ tab_spaces = 4
 fn_call_width = 80
 
 # Maximum width in the body of a struct lit before falling back to vertical formatting.
-struct_lit_width = 32
+struct_lit_width = 60
 
 # Maximum width in the body of a struct variant before falling back to vertical formatting.
-struct_variant_width = 50
+struct_variant_width = 60
 
 

@@ -283,13 +283,7 @@ impl<'a> System<'a> for ItemDropSystem {
                 dropper_pos.y = dropped_pos.y;
             }
             positions
-                .insert(
-                    to_drop.item,
-                    Position {
-                        x: dropper_pos.x,
-                        y: dropper_pos.y,
-                    },
-                )
+                .insert(to_drop.item, Position { x: dropper_pos.x, y: dropper_pos.y })
                 .expect("Unable to insert position");
             backpack.remove(to_drop.item);
 
