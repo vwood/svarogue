@@ -402,9 +402,18 @@ impl State {
     }
 }
 
+
+rltk::embedded_resource!(FONT, "../resources/Gold Box 8x8 Monospaced_1x.png");
+
 fn main() -> rltk::BError {
+    rltk::link_resource!(FONT, "../resources/Gold Box 8x8 Monospaced_1x.png");
+    
     use rltk::RltkBuilder;
-    let context = RltkBuilder::simple80x50().with_title("7DRL 2022").build()?;
+    let context = RltkBuilder::new()
+        .with_font("../resources/Gold Box 8x8 Monospaced_1x.png", 8, 8)  // simple80x50()
+        .with_simple_console(80, 50, "../resources/Gold Box 8x8 Monospaced_1x.png")  // simple80x50()
+        .with_title("7DRL 2022")
+        .build()?;
 
     let mut gs = State { ecs: World::new() };
     gs.ecs.register::<Position>();
