@@ -2,11 +2,12 @@ use super::{
     gamelog::GameLog, rex_assets::RexAssets, CombatStats, Equipped, InBackpack, Map, Name, Player,
     Position, RunState, State, Viewshed,
 };
-use rltk::{Point, Rltk, VirtualKeyCode, RGB};
+use rltk::{Point, Rect, Rltk, VirtualKeyCode, RGB};
 use specs::prelude::*;
 
 pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
-    ctx.draw_box(0, 43, 79, 6, RGB::named(rltk::BLACK), RGB::named(rltk::BLACK));
+    // ctx.draw_box(0, 43, 79, 6, RGB::named(rltk::BLACK), RGB::named(rltk::BLACK));
+    ctx.fill_region(Rect { x1: 0, y1: 43, x2: 80, y2: 50 }, 32, (40, 0, 0), (40, 0, 0));
 
     let combat_stats = ecs.read_storage::<CombatStats>();
     let players = ecs.read_storage::<Player>();
@@ -505,9 +506,9 @@ pub enum GameOverResult {
 }
 
 pub fn game_over(ctx: &mut Rltk) -> GameOverResult {
-    ctx.draw_box(10, 19, 60, 4, RGB::named(rltk::BLACK), RGB::named(rltk::BLACK));
+    ctx.fill_region(Rect { x1: 0, y1: 19, x2: 80, y2: 25 }, 32, (40, 0, 0), (40, 0, 0));
 
-    ctx.print_color_centered(21, RGB::named(rltk::RED), RGB::named(rltk::BLACK), "Y O U   D I E D");
+    ctx.print_color_centered(22, RGB::named(rltk::RED), (40, 0, 0), "Y O U   D I E D");
 
     match ctx.key {
         None => GameOverResult::NoSelection,
