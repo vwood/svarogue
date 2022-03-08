@@ -1,3 +1,5 @@
+use noise::{Fbm, NoiseFn, Seedable};
+use rltk::RandomNumberGenerator;
 use rltk::{Algorithm2D, BaseMap, Point, Rltk, RGB};
 use serde::{Deserialize, Serialize};
 use specs::prelude::*;
@@ -10,6 +12,7 @@ pub const MAPCOUNT: usize = MAPHEIGHT * MAPWIDTH;
 #[derive(PartialEq, Copy, Clone, Serialize, Deserialize)]
 pub enum TileType {
     DirtWall,
+    DirtWall2,
     StoneWall,
     Floor,
     DownStairs,
@@ -45,7 +48,9 @@ impl Map {
 
     pub fn populate_blocked(&mut self) {
         for (i, tile) in self.tiles.iter_mut().enumerate() {
-            self.blocked[i] = *tile == TileType::StoneWall || *tile == TileType::DirtWall;
+            self.blocked[i] = *tile == TileType::StoneWall
+                || *tile == TileType::DirtWall
+                || *tile == TileType::DirtWall2;
         }
     }
 
@@ -56,8 +61,27 @@ impl Map {
     }
 
     pub fn new(new_depth: i32) -> Map {
+        let mut tiles = vec![TileType::DirtWall; MAPCOUNT];
+        let mut rng = RandomNumberGenerator::new();
+
+        let simplex = Fbm::new().set_seed(rng.range(0, u32::MAX) as u32);
+
+        for x in 0..MAPWIDTH {
+            for y in 0..MAPHEIGHT {
+                let idx = (y as usize * MAPWIDTH) + x as usize;
+
+                if simplex.get([
+                    4.0 * x as f64 / MAPWIDTH as f64,
+                    4.0 * y as f64 / MAPHEIGHT as f64,
+                ]) > 0.0
+                {
+                    tiles[idx] = TileType::DirtWall2;
+                }
+            }
+        }
+
         Map {
-            tiles: vec![TileType::DirtWall; MAPCOUNT],
+            tiles: tiles,
             width: MAPWIDTH as i32,
             height: MAPHEIGHT as i32,
             revealed_tiles: vec![false; MAPCOUNT],
@@ -71,7 +95,9 @@ impl Map {
 
 impl BaseMap for Map {
     fn is_opaque(&self, idx: usize) -> bool {
-        self.tiles[idx] == TileType::DirtWall || self.tiles[idx] == TileType::StoneWall
+        self.tiles[idx] == TileType::DirtWall
+            || self.tiles[idx] == TileType::StoneWall
+            || self.tiles[idx] == TileType::DirtWall2
     }
 
     fn get_pathing_distance(&self, idx1: usize, idx2: usize) -> f32 {
@@ -142,8 +168,12 @@ pub fn draw_map(ecs: &World, ctx: &mut Rltk) {
                     fg = RGB::from_f32(0.0, 0.8, 0.8);
                 }
                 TileType::StoneWall => {
+                    glyph = 177; // rltk::to_cp437('#');
+                    fg = RGB::from_f32(0.5, 0.6, 0.8);
+                }
+                TileType::DirtWall2 => {
                     glyph = rltk::to_cp437('#');
-                    fg = RGB::from_f32(0.3, 0.3, 8.0);
+                    fg = RGB::from_f32(0.8, 0.8, 0.4);
                 }
                 TileType::DirtWall => {
                     glyph = rltk::to_cp437('#');
@@ -155,7 +185,7 @@ pub fn draw_map(ecs: &World, ctx: &mut Rltk) {
                 }
             }
             if !map.visible_tiles[idx] {
-                fg = fg.to_greyscale() * 0.5
+                fg = fg.to_greyscale() * 0.8
             }
             ctx.set(x, y, fg, RGB::from_f32(0., 0., 0.), glyph);
         }
