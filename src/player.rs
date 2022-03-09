@@ -179,6 +179,15 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
             VirtualKeyCode::S => return RunState::MoveShield,
             VirtualKeyCode::Z => return RunState::Dodge,
 
+            VirtualKeyCode::F1 => {
+                let mut gamelog = gs.ecs.fetch_mut::<GameLog>();
+                gamelog
+                    .entries
+                    .push("'A' to move weapon, 'S' to move shield".to_string());
+                gamelog.entries.push("'Z' to dodge".to_string());
+                return RunState::AwaitingInput;
+            }
+
             // Save and Quit
             VirtualKeyCode::Escape => return RunState::SaveGame,
 
@@ -367,7 +376,6 @@ pub fn player_shield_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
 
     RunState::PlayerTurn
 }
-
 
 ///
 /// DODGE SYSTEM

@@ -46,7 +46,7 @@ pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
     let mut y = 49;
     for s in log.entries.iter().rev() {
         if y > 44 {
-            ctx.print_color(2, y, RGB::named(rltk::GRAY), (40, 0, 0), s);
+            ctx.print_color(2, y, RGB::named(rltk::LIGHT_GRAY), (40, 0, 0), s);
         }
         y -= 1;
     }
