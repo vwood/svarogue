@@ -299,11 +299,11 @@ impl GameState for State {
 
             // TODO: this
             RunState::MoveWeapon => {
-                newrunstate = player_input(self, ctx);
+                newrunstate = player_weapon_input(self, ctx);
                 // newrunstate = RunState::PreRun;
             }
             RunState::MoveShield => {
-                newrunstate = player_input(self, ctx);
+                newrunstate = player_shield_input(self, ctx);
                 // newrunstate = RunState::PreRun;
             }
             RunState::Dodge => {

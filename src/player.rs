@@ -204,6 +204,174 @@ fn player_use_stamina(ecs: &mut World, amount: i32) -> bool {
     }
 }
 
+///
+/// WEAPON MOVEMENT SYSTEM
+///
+pub fn player_weapon_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
+    // Player movement - weapon movement mode
+    match ctx.key {
+        None => return RunState::Dodge, // Nothing happened
+        Some(key) => match key {
+            VirtualKeyCode::Left | VirtualKeyCode::Numpad4 | VirtualKeyCode::H => {
+                if player_use_stamina(&mut gs.ecs, 1) {
+                    try_move_player(-1, 0, &mut gs.ecs);
+                    try_move_player(-1, 0, &mut gs.ecs);
+                }
+            }
+
+            VirtualKeyCode::Right | VirtualKeyCode::Numpad6 | VirtualKeyCode::L => {
+                if player_use_stamina(&mut gs.ecs, 1) {
+                    try_move_player(1, 0, &mut gs.ecs);
+                    try_move_player(1, 0, &mut gs.ecs);
+                }
+            }
+
+            VirtualKeyCode::Up | VirtualKeyCode::Numpad8 | VirtualKeyCode::K => {
+                if player_use_stamina(&mut gs.ecs, 1) {
+                    try_move_player(0, -1, &mut gs.ecs);
+                    try_move_player(0, -1, &mut gs.ecs);
+                }
+            }
+
+            VirtualKeyCode::Down | VirtualKeyCode::Numpad2 | VirtualKeyCode::J => {
+                if player_use_stamina(&mut gs.ecs, 1) {
+                    try_move_player(0, 1, &mut gs.ecs);
+                    try_move_player(0, 1, &mut gs.ecs);
+                }
+            }
+
+            // Diagonals
+            VirtualKeyCode::Numpad9 | VirtualKeyCode::U => {
+                if player_use_stamina(&mut gs.ecs, 1) {
+                    try_move_player(1, -1, &mut gs.ecs);
+                    try_move_player(1, -1, &mut gs.ecs);
+                }
+            }
+
+            VirtualKeyCode::Numpad7 | VirtualKeyCode::Y => {
+                if player_use_stamina(&mut gs.ecs, 1) {
+                    try_move_player(-1, -1, &mut gs.ecs);
+                    try_move_player(-1, -1, &mut gs.ecs);
+                }
+            }
+
+            VirtualKeyCode::Numpad3 | VirtualKeyCode::N => {
+                if player_use_stamina(&mut gs.ecs, 1) {
+                    try_move_player(1, 1, &mut gs.ecs);
+                    try_move_player(1, 1, &mut gs.ecs);
+                }
+            }
+
+            VirtualKeyCode::Numpad1 | VirtualKeyCode::B => {
+                if player_use_stamina(&mut gs.ecs, 1) {
+                    try_move_player(-1, 1, &mut gs.ecs);
+                    try_move_player(-1, 1, &mut gs.ecs);
+                }
+            }
+
+            // can still skip Turn
+            VirtualKeyCode::Numpad5 | VirtualKeyCode::Space => return skip_turn(&mut gs.ecs),
+
+            // Might as well accept these too
+            VirtualKeyCode::A => return RunState::MoveWeapon,
+            VirtualKeyCode::S => return RunState::MoveShield,
+            VirtualKeyCode::Z => return RunState::Dodge,
+
+            // Escape dodge mode
+            VirtualKeyCode::Escape => return RunState::AwaitingInput,
+            _ => return RunState::Dodge,
+        },
+    }
+
+    RunState::PlayerTurn
+}
+
+///
+/// SHIELD MOVEMENT SYSTEM
+///
+pub fn player_shield_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
+    // Player movement - shield movement mode
+    match ctx.key {
+        None => return RunState::Dodge, // Nothing happened
+        Some(key) => match key {
+            VirtualKeyCode::Left | VirtualKeyCode::Numpad4 | VirtualKeyCode::H => {
+                if player_use_stamina(&mut gs.ecs, 1) {
+                    try_move_player(-1, 0, &mut gs.ecs);
+                    try_move_player(-1, 0, &mut gs.ecs);
+                }
+            }
+
+            VirtualKeyCode::Right | VirtualKeyCode::Numpad6 | VirtualKeyCode::L => {
+                if player_use_stamina(&mut gs.ecs, 1) {
+                    try_move_player(1, 0, &mut gs.ecs);
+                    try_move_player(1, 0, &mut gs.ecs);
+                }
+            }
+
+            VirtualKeyCode::Up | VirtualKeyCode::Numpad8 | VirtualKeyCode::K => {
+                if player_use_stamina(&mut gs.ecs, 1) {
+                    try_move_player(0, -1, &mut gs.ecs);
+                    try_move_player(0, -1, &mut gs.ecs);
+                }
+            }
+
+            VirtualKeyCode::Down | VirtualKeyCode::Numpad2 | VirtualKeyCode::J => {
+                if player_use_stamina(&mut gs.ecs, 1) {
+                    try_move_player(0, 1, &mut gs.ecs);
+                    try_move_player(0, 1, &mut gs.ecs);
+                }
+            }
+
+            // Diagonals
+            VirtualKeyCode::Numpad9 | VirtualKeyCode::U => {
+                if player_use_stamina(&mut gs.ecs, 1) {
+                    try_move_player(1, -1, &mut gs.ecs);
+                    try_move_player(1, -1, &mut gs.ecs);
+                }
+            }
+
+            VirtualKeyCode::Numpad7 | VirtualKeyCode::Y => {
+                if player_use_stamina(&mut gs.ecs, 1) {
+                    try_move_player(-1, -1, &mut gs.ecs);
+                    try_move_player(-1, -1, &mut gs.ecs);
+                }
+            }
+
+            VirtualKeyCode::Numpad3 | VirtualKeyCode::N => {
+                if player_use_stamina(&mut gs.ecs, 1) {
+                    try_move_player(1, 1, &mut gs.ecs);
+                    try_move_player(1, 1, &mut gs.ecs);
+                }
+            }
+
+            VirtualKeyCode::Numpad1 | VirtualKeyCode::B => {
+                if player_use_stamina(&mut gs.ecs, 1) {
+                    try_move_player(-1, 1, &mut gs.ecs);
+                    try_move_player(-1, 1, &mut gs.ecs);
+                }
+            }
+
+            // can still skip Turn
+            VirtualKeyCode::Numpad5 | VirtualKeyCode::Space => return skip_turn(&mut gs.ecs),
+
+            // Might as well accept these too
+            VirtualKeyCode::A => return RunState::MoveWeapon,
+            VirtualKeyCode::S => return RunState::MoveShield,
+            VirtualKeyCode::Z => return RunState::Dodge,
+
+            // Escape dodge mode
+            VirtualKeyCode::Escape => return RunState::AwaitingInput,
+            _ => return RunState::Dodge,
+        },
+    }
+
+    RunState::PlayerTurn
+}
+
+
+///
+/// DODGE SYSTEM
+///
 pub fn player_dodge_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
     // Player movement - dodge mode
     match ctx.key {

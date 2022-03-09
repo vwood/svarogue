@@ -13,7 +13,7 @@ pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
     let players = ecs.read_storage::<Player>();
     for (_player, stats) in (&players, &combat_stats).join() {
         let health = format!(" HP: {} / {} ", stats.hp, stats.max_hp);
-        ctx.print_color(12, 43, RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK), &health);
+        ctx.print_color(12, 43, RGB::named(rltk::YELLOW), (40, 0, 0), &health);
 
         ctx.draw_bar_horizontal(
             28,
@@ -25,7 +25,7 @@ pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
             RGB::named(rltk::BLACK),
         );
         let stamina = format!(" SP: {} / {} ", stats.stamina, stats.max_stamina);
-        ctx.print_color(12, 44, RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK), &stamina);
+        ctx.print_color(12, 44, RGB::named(rltk::YELLOW), (40, 0, 0), &stamina);
 
         ctx.draw_bar_horizontal(
             28,
@@ -40,7 +40,7 @@ pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
 
     let map = ecs.fetch::<Map>();
     let depth = format!("Depth: {}", map.depth);
-    ctx.print_color(2, 43, RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK), &depth);
+    ctx.print_color(2, 43, RGB::named(rltk::YELLOW), (40, 0, 0), &depth);
 
     let log = ecs.fetch::<GameLog>();
     let mut y = 49;
