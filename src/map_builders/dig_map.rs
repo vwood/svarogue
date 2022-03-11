@@ -159,7 +159,7 @@ impl DigMapBuilder {
                     });
                 }
 
-                apply_point(&mut self.map, x, y);
+                apply_point(&mut self.map, x, y, TileType::Floor);
             }
         }
 

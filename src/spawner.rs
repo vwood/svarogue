@@ -39,12 +39,13 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
         .build()
 }
 
-const MAX_MONSTERS: i32 = 4;
+const MAX_MONSTERS: i32 = 7;
 
 fn room_table(map_depth: i32) -> RandomTable {
     RandomTable::new()
-        .add("Goblin", 10)
-        .add("Orc", 1 + map_depth)
+        .add("Troglodyte", 10)
+        .add("Skeleton", 2 + map_depth)
+        .add("Ogre", 1 + map_depth)
         .add("Health Potion", 7)
         // .add("Fireball Scroll", 2 + map_depth)
         // .add("Confusion Scroll", 2 + map_depth)
@@ -52,8 +53,8 @@ fn room_table(map_depth: i32) -> RandomTable {
         .add("Dagger", 3 * 2)
         .add("Shield", 3)
         .add("Longsword", map_depth * 2)
-        .add("Halberd", map_depth * 2)
-        .add("Tower Shield", map_depth * 2)
+        .add("Halberd", map_depth)
+        .add("Tower Shield", map_depth)
         .add("Bear Trap", 5)
 }
 
@@ -66,7 +67,7 @@ pub fn spawn_room(ecs: &mut World, room: &Rect, map_depth: i32) {
     // Scope to keep the borrow checker happy
     {
         let mut rng = ecs.write_resource::<RandomNumberGenerator>();
-        let num_spawns = rng.roll_dice(1, MAX_MONSTERS + 3) + (map_depth - 1) - 3;
+        let num_spawns = rng.roll_dice(2, MAX_MONSTERS) + (map_depth - 2);
 
         for _i in 0..num_spawns {
             let mut added = false;
@@ -95,8 +96,9 @@ pub fn spawn_room(ecs: &mut World, room: &Rect, map_depth: i32) {
 
 fn spawn_item(ecs: &mut World, x: i32, y: i32, item: &str) {
     match item.as_ref() {
-        "Goblin" => goblin(ecs, x, y),
-        "Orc" => orc(ecs, x, y),
+        "Troglodyte" => troglodyte(ecs, x, y),
+        "Skeleton" => skeleton(ecs, x, y),
+        "Ogre" => ogre(ecs, x, y),
         "Health Potion" => health_potion(ecs, x, y),
         "Fireball Scroll" => fireball_scroll(ecs, x, y),
         "Confusion Scroll" => confusion_scroll(ecs, x, y),
@@ -131,29 +133,35 @@ pub fn spawn_locations(ecs: &mut World, positions: &[Position], map_depth: i32) 
     }
 }
 
-fn orc(ecs: &mut World, x: i32, y: i32) {
-    monster(ecs, x, y, rltk::to_cp437('o'), "Orc");
+fn skeleton(ecs: &mut World, x: i32, y: i32) {
+    monster(ecs, x, y, rltk::to_cp437('S'), "Skeleton", RGB::named(rltk::WHITE), 8);
 }
-fn goblin(ecs: &mut World, x: i32, y: i32) {
-    monster(ecs, x, y, rltk::to_cp437('g'), "Goblin");
+fn troglodyte(ecs: &mut World, x: i32, y: i32) {
+    monster(ecs, x, y, rltk::to_cp437('T'), "Troglodyte", RGB::named(rltk::BROWN1), 6);
+}
+fn ogre(ecs: &mut World, x: i32, y: i32) {
+    monster(ecs, x, y, rltk::to_cp437('O'), "Ogre", RGB::named(rltk::GREEN), 12);
 }
 
-fn monster<S: ToString>(ecs: &mut World, x: i32, y: i32, glyph: rltk::FontCharType, name: S) {
+fn monster<S: ToString>(
+    ecs: &mut World,
+    x: i32,
+    y: i32,
+    glyph: rltk::FontCharType,
+    name: S,
+    fg: RGB,
+    hp: i32,
+) {
     ecs.create_entity()
         .with(Position { x, y })
-        .with(Renderable {
-            glyph,
-            fg: RGB::named(rltk::RED),
-            bg: RGB::named(rltk::BLACK),
-            render_order: 1,
-        })
+        .with(Renderable { glyph, fg: fg, bg: RGB::named(rltk::BLACK), render_order: 1 })
         .with(Viewshed { visible_tiles: Vec::new(), range: 8, dirty: true })
         .with(Monster {})
         .with(Name { name: name.to_string() })
         .with(BlocksTile {})
         .with(CombatStats {
-            max_hp: 16,
-            hp: 16,
+            max_hp: hp,
+            hp: hp,
             stamina: 2,
             max_stamina: 2,
             defense: 1,

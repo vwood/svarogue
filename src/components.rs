@@ -11,6 +11,12 @@ pub struct Position {
     pub y: i32,
 }
 
+impl Position {
+    pub fn square_distance(&self, other: &Position) -> i32 {
+        (self.x - other.x).pow(2) + (self.y - other.y).pow(2)
+    }
+}
+
 #[derive(Component, ConvertSaveload, Clone)]
 pub struct Renderable {
     pub glyph: rltk::FontCharType,

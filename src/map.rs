@@ -16,6 +16,7 @@ pub enum TileType {
     StoneWall,
     Floor,
     DownStairs,
+    Door,
 }
 
 #[derive(Default, Serialize, Deserialize, Clone)]
@@ -182,6 +183,10 @@ pub fn draw_map(ecs: &World, ctx: &mut Rltk) {
                 TileType::DownStairs => {
                     glyph = rltk::to_cp437('>');
                     fg = RGB::from_f32(0.0, 1.0, 1.0);
+                }
+                TileType::Door => {
+                    glyph = rltk::to_cp437('+');
+                    fg = RGB::from_f32(1.0, 0.2, 0.2);
                 }
             }
             if !map.visible_tiles[idx] {

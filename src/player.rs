@@ -19,9 +19,9 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     for (entity, _player, pos, viewshed) in
         (&entities, &players, &mut positions, &mut viewsheds).join()
     {
-        if pos.x + delta_x < 1
+        if pos.x + delta_x < 0
             || pos.x + delta_x > map.width - 1
-            || pos.y + delta_y < 1
+            || pos.y + delta_y < 0
             || pos.y + delta_y > map.height - 1
         {
             return;
@@ -173,6 +173,14 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
             VirtualKeyCode::I => return RunState::ShowInventory,
             VirtualKeyCode::D => return RunState::ShowDropItem,
             VirtualKeyCode::R => return RunState::ShowRemoveItem,
+
+            // Cheat codes
+            VirtualKeyCode::F2 => {
+                let mut map = gs.ecs.fetch_mut::<Map>();
+                for r in map.revealed_tiles.iter_mut() {
+                    *r = true;
+                }
+            }
 
             // Moving weapons
             VirtualKeyCode::A => return RunState::MoveWeapon,
