@@ -91,6 +91,11 @@ pub fn try_move_weapon(delta_x: i32, delta_y: i32, ecs: &mut World) {
                 return;
             }
         }
+
+        if !map.blocked[destination_idx] {
+            pos.x = min(79, max(0, pos.x + delta_x));
+            pos.y = min(49, max(0, pos.y + delta_y));
+        }
     }
 }
 
@@ -225,15 +230,14 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
 
             // Moving weapons
             VirtualKeyCode::A => return RunState::MoveWeapon,
-            VirtualKeyCode::S => return RunState::MoveShield,
+            VirtualKeyCode::S => return RunState::Dodge,
             VirtualKeyCode::Z => return RunState::Dodge,
 
             VirtualKeyCode::F1 => {
                 let mut gamelog = gs.ecs.fetch_mut::<GameLog>();
                 gamelog
                     .entries
-                    .push("'A' to move weapon, 'S' to move shield".to_string());
-                gamelog.entries.push("'Z' to dodge".to_string());
+                    .push("'A' to move weapon, 'Z' to dodge".to_string());
                 return RunState::AwaitingInput;
             }
 
@@ -321,7 +325,7 @@ pub fn player_weapon_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
 
             // Might as well accept these too
             VirtualKeyCode::A => return RunState::MoveWeapon,
-            VirtualKeyCode::S => return RunState::MoveShield,
+            VirtualKeyCode::S => return RunState::Dodge,
             VirtualKeyCode::Z => return RunState::Dodge,
 
             // Escape dodge mode
@@ -403,7 +407,7 @@ pub fn player_shield_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
 
             // Might as well accept these too
             VirtualKeyCode::A => return RunState::MoveWeapon,
-            VirtualKeyCode::S => return RunState::MoveShield,
+            VirtualKeyCode::S => return RunState::Dodge,
             VirtualKeyCode::Z => return RunState::Dodge,
 
             // Escape dodge mode
@@ -481,7 +485,7 @@ pub fn player_dodge_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
 
             // Might as well accept these too
             VirtualKeyCode::A => return RunState::MoveWeapon,
-            VirtualKeyCode::S => return RunState::MoveShield,
+            VirtualKeyCode::S => return RunState::Dodge,
             VirtualKeyCode::Z => return RunState::Dodge,
 
             // Escape dodge mode

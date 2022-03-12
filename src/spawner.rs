@@ -57,6 +57,14 @@ pub fn weapon_entity(ecs: &mut World, x: i32, y: i32, owner: Entity) -> Entity {
             render_order: 0,
         })
         .with(WeaponStats { power: 8, owner: owner })
+        .with(CombatStats {
+            max_hp: 30,
+            hp: 30,
+            stamina: 1,
+            max_stamina: 1,
+            defense: 20,
+            power: 8,
+        })
         .with(Name { name: "Player Weapon".to_string() })
         .marked::<SimpleMarker<SerializeMe>>()
         .build()

@@ -68,11 +68,13 @@ impl<'a> System<'a> for MeleeCombatSystem {
 
                     let pos = positions.get(wants_melee.target);
                     if let Some(pos) = pos {
-                        let char = match rng.roll_dice(1, 5) {
+                        let char = match rng.roll_dice(1, 7) {
                             1 => '!',
                             2 => '?',
                             3 => '#',
                             4 => '*',
+                            5 => '$',
+                            6 => '%',
                             _ => '‼',
                         };
                         particle_builder.request(
