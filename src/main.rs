@@ -448,12 +448,12 @@ impl State {
 rltk::embedded_resource!(FONT, "../resources/Gold Box 8x8 Monospaced_1x.png");
 
 fn main() -> rltk::BError {
-    rltk::link_resource!(FONT, "../resources/Gold Box 8x8 Monospaced_1x.png");
+    rltk::link_resource!(FONT, "resources/Gold Box 8x8 Monospaced_1x.png");
 
     use rltk::RltkBuilder;
     let mut context = RltkBuilder::new()
-        .with_font("../resources/Gold Box 8x8 Monospaced_1x.png", 8, 8)
-        .with_simple_console(80, 50, "../resources/Gold Box 8x8 Monospaced_1x.png")
+        .with_font("Gold Box 8x8 Monospaced_1x.png", 8, 8)
+        .with_simple_console(80, 50, "Gold Box 8x8 Monospaced_1x.png")
         .with_title("7DRL 2022")
         .build()?;
     context.with_post_scanlines(true);
