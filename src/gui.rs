@@ -527,3 +527,91 @@ pub fn game_over(ctx: &mut Rltk) -> GameOverResult {
         Some(_) => GameOverResult::QuitToMenu,
     }
 }
+
+pub fn show_intro(gs: &mut State, ctx: &mut Rltk) -> bool {
+    let assets = gs.ecs.fetch::<RexAssets>();
+    ctx.render_xp_sprite(&assets.intro, 0, 0);
+
+    ctx.draw_box_double(38, 19, 40, 19, RGB::named(rltk::WHEAT), RGB::named(rltk::BLACK));
+    ctx.print_color(
+        41,
+        21,
+        RGB::named(rltk::WHITE),
+        RGB::named(rltk::BLACK),
+        "WELCOME TO MY 7 DAY ROGUELIKE",
+    );
+
+    ctx.print_color(
+        41,
+        23,
+        RGB::named(rltk::WHITE),
+        RGB::named(rltk::BLACK),
+        "vi keys (hjkl yubn) are supported",
+    );
+    ctx.print_color(
+        41,
+        24,
+        RGB::named(rltk::WHITE),
+        RGB::named(rltk::BLACK),
+        "as well as numpad and arrow keys",
+    );
+
+    ctx.print_color(
+        41,
+        26,
+        RGB::named(rltk::WHITE),
+        RGB::named(rltk::BLACK),
+        "You can dodge by pressing Z and",
+    );
+    ctx.print_color(
+        41,
+        27,
+        RGB::named(rltk::WHITE),
+        RGB::named(rltk::BLACK),
+        "then the direction to dodge",
+    );
+    ctx.print_color(
+        41,
+        28,
+        RGB::named(rltk::WHITE),
+        RGB::named(rltk::BLACK),
+        "You can move your weapon with A and ",
+    );
+    ctx.print_color(
+        41,
+        29,
+        RGB::named(rltk::WHITE),
+        RGB::named(rltk::BLACK),
+        " then moving in a similar manner.",
+    );
+    ctx.print_color(
+        41,
+        30,
+        RGB::named(rltk::WHITE),
+        RGB::named(rltk::BLACK),
+        "Both cost stamina, which you regain ",
+    );
+    ctx.print_color(
+        41,
+        31,
+        RGB::named(rltk::WHITE),
+        RGB::named(rltk::BLACK),
+        "by resting '.' or ' '",
+    );
+
+    ctx.print_color(
+        41,
+        33,
+        RGB::named(rltk::WHITE),
+        RGB::named(rltk::BLACK),
+        "You're probably after an amulet ",
+    );
+    ctx.print_color(41, 34, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), "or something.");
+
+    ctx.print_color(41, 36, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), "Hope you enjoy.");
+
+    match ctx.key {
+        None => false,
+        Some(_) => true,
+    }
+}

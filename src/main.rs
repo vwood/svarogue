@@ -45,6 +45,7 @@ pub enum RunState {
     MainMenu { menu_selection: gui::MainMenuSelection },
     SaveGame,
     NextLevel,
+    ShowIntro,
     ShowRemoveItem,
     GameOver,
     MoveWeapon,
@@ -259,6 +260,11 @@ impl GameState for State {
                     }
                 }
             }
+            RunState::ShowIntro { .. } => {
+                if gui::show_intro(self, ctx) {
+                    newrunstate = RunState::PreRun;
+                }
+            }
             RunState::MainMenu { .. } => {
                 let result = gui::main_menu(self, ctx);
                 match result {
@@ -268,7 +274,8 @@ impl GameState for State {
                     gui::MainMenuResult::Selected { selected } => match selected {
                         gui::MainMenuSelection::NewGame => {
                             self.game_over_cleanup();
-                            newrunstate = RunState::PreRun;
+                            newrunstate = RunState::ShowIntro;
+                            // and then PreRun...
                         }
                         gui::MainMenuSelection::LoadGame => {
                             saveload_system::load_game(&mut self.ecs);
