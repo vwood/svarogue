@@ -30,7 +30,7 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
             stamina: 10,
             max_stamina: 10,
             defense: 2,
-            power: 5,
+            power: 3,
         })
         .with(Attributes {
             strength: Attribute { base: 10, modifiers: 0, bonus: 0 },
@@ -105,10 +105,10 @@ fn room_table(map_depth: i32) -> RandomTable {
         // .add("Fireball Scroll", 2 + map_depth)
         // .add("Confusion Scroll", 2 + map_depth)
         // .add("Magic Missile Scroll", 4)
-        .add("Dagger", 3 * 2)
+        // .add("Dagger", 3 * 2)
         .add("Shield", 3)
-        .add("Longsword", map_depth * 2)
-        .add("Halberd", map_depth)
+        // .add("Longsword", map_depth * 2)
+        // .add("Halberd", map_depth)
         .add("Tower Shield", map_depth)
         .add("Bear Trap", 5)
 }

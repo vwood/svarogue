@@ -572,43 +572,37 @@ pub fn show_intro(gs: &mut State, ctx: &mut Rltk) -> bool {
     );
     ctx.print_color(
         41,
-        28,
+        29,
         RGB::named(rltk::WHITE),
         RGB::named(rltk::BLACK),
         "You can move your weapon with A and ",
     );
     ctx.print_color(
         41,
-        29,
+        30,
         RGB::named(rltk::WHITE),
         RGB::named(rltk::BLACK),
-        " then moving in a similar manner.",
+        "then moving in a similar manner.",
     );
     ctx.print_color(
         41,
-        30,
+        32,
         RGB::named(rltk::WHITE),
         RGB::named(rltk::BLACK),
         "Both cost stamina, which you regain ",
     );
-    ctx.print_color(
-        41,
-        31,
-        RGB::named(rltk::WHITE),
-        RGB::named(rltk::BLACK),
-        "by resting '.' or ' '",
-    );
+    ctx.print_color(41, 33, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), "by resting (space)");
 
     ctx.print_color(
         41,
-        33,
+        34,
         RGB::named(rltk::WHITE),
         RGB::named(rltk::BLACK),
         "You're probably after an amulet ",
     );
-    ctx.print_color(41, 34, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), "or something.");
+    ctx.print_color(41, 35, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), "or something.");
 
-    ctx.print_color(41, 36, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), "Hope you enjoy.");
+    ctx.print_color(41, 37, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), "Hope you enjoy.");
 
     match ctx.key {
         None => false,
