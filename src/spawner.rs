@@ -30,7 +30,7 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
             stamina: 10,
             max_stamina: 10,
             defense: 2,
-            power: 3,
+            power: 2,
         })
         .with(Attributes {
             strength: Attribute { base: 10, modifiers: 0, bonus: 0 },
