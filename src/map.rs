@@ -1,3 +1,4 @@
+use super::Position;
 use noise::{Fbm, NoiseFn, Seedable};
 use rltk::RandomNumberGenerator;
 use rltk::{Algorithm2D, BaseMap, Point, Rltk, RGB};
@@ -202,4 +203,42 @@ pub fn draw_map(ecs: &World, ctx: &mut Rltk) {
             y += 1;
         }
     }
+}
+
+pub fn find_empty_adjacent(ecs: &World, x: i32, y: i32) -> (i32, i32) {
+    let map = ecs.fetch::<Map>();
+    let (w, h) = (map.width, map.height);
+
+    let entities = ecs.entities();
+
+    let possibilities = vec![
+        (-1, 0),
+        (1, 0),
+        (0, 1),
+        (0, -1),
+        (-1, 1),
+        (-1, -1),
+        (1, -1),
+        (1, 1),
+    ];
+
+    for (px, py) in possibilities {
+        let (nx, ny) = (x + px, y + py);
+        if nx < 0 || nx >= w || ny < 0 || ny >= h {
+            continue;
+        }
+
+        let idx = map.xy_idx(nx, ny);
+        if map.blocked[idx] {
+            continue;
+        }
+
+        if map.tile_content[idx].len() > 0 {
+            continue;
+        }
+
+        return (nx, ny);
+    }
+
+    return (x, y);
 }

@@ -392,7 +392,8 @@ impl DigMapTurbBuilder {
                 }
 
                 if room_id > 0 {
-                    apply_point(&mut self.map, x, y, TileType::Door);
+                    // apply_point(&mut self.map, x, y, TileType::Door);
+                    apply_point(&mut self.map, x, y, TileType::Floor);
                 } else {
                     apply_point(&mut self.map, x, y, TileType::Floor);
                 }
@@ -406,7 +407,9 @@ impl DigMapTurbBuilder {
             for x in room.x1..min(w, room.x2 + 2) {
                 for y in room.y1..min(h, room.y2 + 2) {
                     let idx = self.map.xy_idx(x, y);
-                    if self.map.tiles[idx] != TileType::Door {
+                    if !(self.map.tiles[idx] == TileType::Door
+                        || self.map.tiles[idx] == TileType::Floor)
+                    {
                         if x == room.x1 || x == room.x2 + 1 || y == room.y1 || y == room.y2 + 1 {
                             self.map.tiles[idx] = TileType::StoneWall;
                         } else {

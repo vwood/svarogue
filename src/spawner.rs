@@ -1,17 +1,19 @@
 use super::{
-    map::MAPWIDTH, random_table::RandomTable, AreaOfEffect, Attribute, Attributes, BlocksTile,
-    CombatStats, Confusion, Consumable, DefenseBonus, EntryTrigger, EquipmentSlot, Equippable,
-    InflictsDamage, Item, MeleePowerBonus, Monster, Name, Player, Position, ProvidesHealing,
-    Ranged, Rect, Renderable, SerializeMe, SingleActivation, Viewshed,
+    map::find_empty_adjacent, map::MAPWIDTH, random_table::RandomTable, AreaOfEffect, Attribute,
+    Attributes, BlocksTile, CombatStats, Confusion, Consumable, DefenseBonus, EntryTrigger,
+    EquipmentSlot, Equippable, InflictsDamage, Item, MeleePowerBonus, Monster, Name, Player,
+    Position, ProvidesHealing, Ranged, Rect, Renderable, SerializeMe, SingleActivation, Viewshed,
+    WeaponStats,
 };
 use rltk::{RandomNumberGenerator, RGB};
 use specs::prelude::*;
 use specs::saveload::{MarkedBuilder, SimpleMarker};
 use std::collections::HashMap;
 
-/// Spawns the player and returns his/her entity object.
+/// Spawns the player and returns their entity object.
 pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
-    ecs.create_entity()
+    let entity = ecs
+        .create_entity()
         .with(Position { x: player_x, y: player_y })
         .with(Renderable {
             glyph: rltk::to_cp437('@'),
@@ -36,7 +38,54 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
             endurance: Attribute { base: 10, modifiers: 0, bonus: 0 },
         })
         .marked::<SimpleMarker<SerializeMe>>()
+        .build();
+
+    let (x, y) = find_empty_adjacent(ecs, player_x, player_y);
+    weapon_entity(ecs, x, y, entity);
+
+    entity
+}
+
+/// Spawns the weapon and returns the entity object.
+pub fn weapon_entity(ecs: &mut World, x: i32, y: i32, owner: Entity) -> Entity {
+    ecs.create_entity()
+        .with(Position { x: x, y: y })
+        .with(Renderable {
+            glyph: rltk::to_cp437('*'),
+            fg: RGB::named(rltk::YELLOW),
+            bg: RGB::named(rltk::BLACK),
+            render_order: 0,
+        })
+        .with(WeaponStats { power: 8, owner: owner })
+        .with(Name { name: "Player Weapon".to_string() })
+        .marked::<SimpleMarker<SerializeMe>>()
         .build()
+}
+
+/// Resets the weapon location
+pub fn reset_weapon_locations(ecs: &mut World) {
+    let mut weapon_stats = ecs.write_storage::<WeaponStats>();
+    let players = ecs.read_storage::<Player>();
+    let mut positions = ecs.write_storage::<Position>();
+    let entities = ecs.entities();
+
+    // let target_name = names.get(wants_melee.target).unwrap();
+
+    for (entity, stats) in (&entities, &weapon_stats).join() {
+        let (x, y);
+        {
+            let position = positions.get(stats.owner).unwrap();
+
+            // silly unstable destructuring assignments
+            let new_xy = find_empty_adjacent(ecs, position.x, position.y);
+            x = new_xy.0;
+            y = new_xy.1;
+        }
+
+        let pos = positions.get_mut(entity).unwrap();
+        pos.x = x;
+        pos.y = y;
+    }
 }
 
 const MAX_MONSTERS: i32 = 7;

@@ -85,37 +85,41 @@ impl State {
     }
 
     fn generate_world_map(&mut self, new_depth: i32) {
-        let mut builder = map_builders::random_builder(new_depth);
-        builder.build_map();
-
-        let player_start;
         {
-            let mut worldmap_resource = self.ecs.write_resource::<Map>();
-            *worldmap_resource = builder.get_map();
-            player_start = builder.get_starting_position();
+            let mut builder = map_builders::random_builder(new_depth);
+            builder.build_map();
+
+            let player_start;
+            {
+                let mut worldmap_resource = self.ecs.write_resource::<Map>();
+                *worldmap_resource = builder.get_map();
+                player_start = builder.get_starting_position();
+            }
+
+            // Spawn map items
+            builder.spawn_entities(&mut self.ecs);
+
+            // Place the player and update resources
+            let (player_x, player_y) = (player_start.x, player_start.y);
+            let mut player_position = self.ecs.write_resource::<Point>();
+            *player_position = Point::new(player_x, player_y);
+            let mut position_components = self.ecs.write_storage::<Position>();
+            let player_entity = self.ecs.fetch::<Entity>();
+            let player_pos_comp = position_components.get_mut(*player_entity);
+            if let Some(player_pos_comp) = player_pos_comp {
+                player_pos_comp.x = player_x;
+                player_pos_comp.y = player_y;
+            }
+
+            // Mark the player's visibility as dirty
+            let mut viewshed_components = self.ecs.write_storage::<Viewshed>();
+            let vs = viewshed_components.get_mut(*player_entity);
+            if let Some(vs) = vs {
+                vs.dirty = true;
+            }
         }
 
-        // Spawn map items
-        builder.spawn_entities(&mut self.ecs);
-
-        // Place the player and update resources
-        let (player_x, player_y) = (player_start.x, player_start.y);
-        let mut player_position = self.ecs.write_resource::<Point>();
-        *player_position = Point::new(player_x, player_y);
-        let mut position_components = self.ecs.write_storage::<Position>();
-        let player_entity = self.ecs.fetch::<Entity>();
-        let player_pos_comp = position_components.get_mut(*player_entity);
-        if let Some(player_pos_comp) = player_pos_comp {
-            player_pos_comp.x = player_x;
-            player_pos_comp.y = player_y;
-        }
-
-        // Mark the player's visibility as dirty
-        let mut viewshed_components = self.ecs.write_storage::<Viewshed>();
-        let vs = viewshed_components.get_mut(*player_entity);
-        if let Some(vs) = vs {
-            vs.dirty = true;
-        }
+        spawner::reset_weapon_locations(&mut self.ecs);
     }
 }
 
@@ -145,6 +149,7 @@ impl GameState for State {
                     data.sort_by(|&a, &b| b.1.render_order.cmp(&a.1.render_order));
                     for (pos, render) in data.iter() {
                         let idx = map.xy_idx(pos.x, pos.y);
+
                         if map.visible_tiles[idx] {
                             ctx.set(pos.x, pos.y, render.fg, render.bg, render.glyph)
                         }
