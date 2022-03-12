@@ -7,7 +7,8 @@ use specs::prelude::*;
 use std::cmp::{max, min};
 
 pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
-    let mut player_moved = false;
+    let mut player_x = 0;
+    let mut player_y = 0;
 
     {
         let mut positions = ecs.write_storage::<Position>();
@@ -60,17 +61,95 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
                 entity_moved
                     .insert(entity, EntityMoved {})
                     .expect("Unable to insert marker");
-                player_moved = true;
+                player_x = pos.x;
+                player_y = pos.y;
             }
         }
     }
-    try_move_weapon(delta_x, delta_y, ecs, player_moved);
+
+    if try_move_weapon_w_player(delta_x, delta_y, ecs, player_x, player_y) {
+        try_move_weapon_w_player(-delta_x, -delta_y, ecs, player_x, player_y);
+    }
 }
 
 /// TODO: use A* pathing to follow player if we can't move the weapon or we get too
 /// far away and the player moved
-pub fn try_move_weapon(delta_x: i32, delta_y: i32, ecs: &mut World, player_moved: bool) {
+pub fn try_move_weapon_w_player(
+    delta_x: i32,
+    delta_y: i32,
+    ecs: &mut World,
+    player_x: i32,
+    player_y: i32,
+) -> bool {
     let player_entity = ecs.fetch::<Entity>();
+
+    let mut positions = ecs.write_storage::<Position>();
+    let weapon_stats = ecs.read_storage::<WeaponStats>();
+    let combat_stats = ecs.read_storage::<CombatStats>();
+    let entities = ecs.entities();
+    let map = ecs.fetch::<Map>();
+    let mut wants_to_melee = ecs.write_storage::<WantsToMelee>();
+
+    let weapon = (&weapon_stats, &positions)
+        .join()
+        .filter(|item| item.0.owner == *player_entity);
+    let count = weapon.count();
+
+    for (entity, weaponstat, pos) in (&entities, &weapon_stats, &mut positions)
+        .join()
+        .filter(|item| item.1.owner == *player_entity)
+    {
+        if pos.x + delta_x < 0
+            || pos.x + delta_x > map.width - 1
+            || pos.y + delta_y < 0
+            || pos.y + delta_y > map.height - 1
+        {
+            if player_x == pos.x && player_y == pos.y {
+                return true;
+            }
+            return false;
+        }
+
+        let destination_idx = map.xy_idx(pos.x + delta_x, pos.y + delta_y);
+
+        for potential_target in map.tile_content[destination_idx].iter() {
+            if *potential_target == *player_entity {
+                if player_x == pos.x + delta_x && player_y == pos.y + delta_y {
+                    return false;
+                } else {
+                    continue;
+                }
+            }
+
+            let target = combat_stats.get(*potential_target);
+            if let Some(_target) = target {
+                wants_to_melee
+                    .insert(entity, WantsToMelee { target: *potential_target })
+                    .expect("Add target failed");
+                return player_x == pos.x && player_y == pos.y;
+            }
+        }
+
+        if !map.blocked[destination_idx] {
+            pos.x = min(79, max(0, pos.x + delta_x));
+            pos.y = min(49, max(0, pos.y + delta_y));
+
+            return false;
+        }
+
+        return player_x == pos.x && player_y == pos.y;
+    }
+
+    return false;
+}
+
+pub fn try_move_weapon_simple(delta_x: i32, delta_y: i32, ecs: &mut World) {
+    let player_entity = ecs.fetch::<Entity>();
+
+    // only used if player_moved for detection
+    let player_pos = ecs.fetch::<Point>();
+    let player_x = player_pos.x + delta_x;
+    let player_y = player_pos.y + delta_y;
 
     let mut positions = ecs.write_storage::<Position>();
     let weapon_stats = ecs.read_storage::<WeaponStats>();
@@ -100,11 +179,7 @@ pub fn try_move_weapon(delta_x: i32, delta_y: i32, ecs: &mut World, player_moved
 
         for potential_target in map.tile_content[destination_idx].iter() {
             if *potential_target == *player_entity {
-                if player_moved {
-                    continue;
-                } else {
-                    return;
-                }
+                return;
             }
 
             let target = combat_stats.get(*potential_target);
@@ -297,50 +372,50 @@ pub fn player_weapon_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
         Some(key) => match key {
             VirtualKeyCode::Left | VirtualKeyCode::Numpad4 | VirtualKeyCode::H => {
                 if player_use_stamina(&mut gs.ecs, 1) {
-                    try_move_weapon(-1, 0, &mut gs.ecs, false);
+                    try_move_weapon_simple(-1, 0, &mut gs.ecs);
                 }
             }
 
             VirtualKeyCode::Right | VirtualKeyCode::Numpad6 | VirtualKeyCode::L => {
                 if player_use_stamina(&mut gs.ecs, 1) {
-                    try_move_weapon(1, 0, &mut gs.ecs, false);
+                    try_move_weapon_simple(1, 0, &mut gs.ecs);
                 }
             }
 
             VirtualKeyCode::Up | VirtualKeyCode::Numpad8 | VirtualKeyCode::K => {
                 if player_use_stamina(&mut gs.ecs, 1) {
-                    try_move_weapon(0, -1, &mut gs.ecs, false);
+                    try_move_weapon_simple(0, -1, &mut gs.ecs);
                 }
             }
 
             VirtualKeyCode::Down | VirtualKeyCode::Numpad2 | VirtualKeyCode::J => {
                 if player_use_stamina(&mut gs.ecs, 1) {
-                    try_move_weapon(0, 1, &mut gs.ecs, false);
+                    try_move_weapon_simple(0, 1, &mut gs.ecs);
                 }
             }
 
             // Diagonals
             VirtualKeyCode::Numpad9 | VirtualKeyCode::U => {
                 if player_use_stamina(&mut gs.ecs, 1) {
-                    try_move_weapon(1, -1, &mut gs.ecs, false);
+                    try_move_weapon_simple(1, -1, &mut gs.ecs);
                 }
             }
 
             VirtualKeyCode::Numpad7 | VirtualKeyCode::Y => {
                 if player_use_stamina(&mut gs.ecs, 1) {
-                    try_move_weapon(-1, -1, &mut gs.ecs, false);
+                    try_move_weapon_simple(-1, -1, &mut gs.ecs);
                 }
             }
 
             VirtualKeyCode::Numpad3 | VirtualKeyCode::N => {
                 if player_use_stamina(&mut gs.ecs, 1) {
-                    try_move_weapon(1, 1, &mut gs.ecs, false);
+                    try_move_weapon_simple(1, 1, &mut gs.ecs);
                 }
             }
 
             VirtualKeyCode::Numpad1 | VirtualKeyCode::B => {
                 if player_use_stamina(&mut gs.ecs, 1) {
-                    try_move_weapon(-1, 1, &mut gs.ecs, false);
+                    try_move_weapon_simple(-1, 1, &mut gs.ecs);
                 }
             }
 
