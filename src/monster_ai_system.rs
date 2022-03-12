@@ -1,5 +1,5 @@
 use super::{Confusion, EntityMoved, Map, Monster, Position, RunState, Viewshed, WantsToMelee};
-use rltk::Point;
+use rltk::{Point, RandomNumberGenerator};
 use specs::prelude::*;
 
 pub struct MonsterAI {}
@@ -18,6 +18,7 @@ impl<'a> System<'a> for MonsterAI {
         WriteStorage<'a, WantsToMelee>,
         WriteStorage<'a, Confusion>,
         WriteStorage<'a, EntityMoved>,
+        WriteExpect<'a, RandomNumberGenerator>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
@@ -33,6 +34,7 @@ impl<'a> System<'a> for MonsterAI {
             mut wants_to_melee,
             mut confused,
             mut entity_moved,
+            mut rng,
         ) = data;
 
         if *runstate != RunState::MonsterTurn {
@@ -60,7 +62,8 @@ impl<'a> System<'a> for MonsterAI {
                     wants_to_melee
                         .insert(entity, WantsToMelee { target: *player_entity })
                         .expect("Unable to insert attack");
-                } else if viewshed.visible_tiles.contains(&*player_pos) {
+                } else if viewshed.visible_tiles.contains(&*player_pos) || rng.roll_dice(1, 8) == 0
+                {
                     // Path to the player
                     let path = rltk::a_star_search(
                         map.xy_idx(pos.x, pos.y),
