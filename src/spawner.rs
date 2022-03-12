@@ -189,13 +189,13 @@ pub fn spawn_locations(ecs: &mut World, positions: &[Position], map_depth: i32) 
 }
 
 fn skeleton(ecs: &mut World, x: i32, y: i32) {
-    monster(ecs, x, y, rltk::to_cp437('S'), "Skeleton", RGB::named(rltk::WHITE), 8);
+    monster(ecs, x, y, rltk::to_cp437('S'), "Skeleton", RGB::named(rltk::WHITE), 8, 5, 2);
 }
 fn troglodyte(ecs: &mut World, x: i32, y: i32) {
-    monster(ecs, x, y, rltk::to_cp437('T'), "Troglodyte", RGB::named(rltk::BROWN1), 6);
+    monster(ecs, x, y, rltk::to_cp437('T'), "Troglodyte", RGB::named(rltk::BROWN1), 6, 4, 1);
 }
 fn ogre(ecs: &mut World, x: i32, y: i32) {
-    monster(ecs, x, y, rltk::to_cp437('O'), "Ogre", RGB::named(rltk::GREEN), 12);
+    monster(ecs, x, y, rltk::to_cp437('O'), "Ogre", RGB::named(rltk::GREEN), 12, 6, 3);
 }
 
 fn monster<S: ToString>(
@@ -206,6 +206,8 @@ fn monster<S: ToString>(
     name: S,
     fg: RGB,
     hp: i32,
+    power: i32,
+    defense: i32,
 ) {
     ecs.create_entity()
         .with(Position { x, y })
@@ -219,8 +221,8 @@ fn monster<S: ToString>(
             hp: hp,
             stamina: 2,
             max_stamina: 2,
-            defense: 1,
-            power: 4,
+            defense: defense,
+            power: power,
         })
         .marked::<SimpleMarker<SerializeMe>>()
         .build();
@@ -378,7 +380,7 @@ fn tower_shield(ecs: &mut World, x: i32, y: i32) {
         .with(Name { name: "Tower Shield".to_string() })
         .with(Item {})
         .with(Equippable { slot: EquipmentSlot::Shield })
-        .with(DefenseBonus { defense: 3 })
+        .with(DefenseBonus { defense: 2 })
         .marked::<SimpleMarker<SerializeMe>>()
         .build();
 }

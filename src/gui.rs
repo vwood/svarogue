@@ -532,7 +532,7 @@ pub fn show_intro(gs: &mut State, ctx: &mut Rltk) -> bool {
     let assets = gs.ecs.fetch::<RexAssets>();
     ctx.render_xp_sprite(&assets.intro, 0, 0);
 
-    ctx.draw_box_double(38, 19, 40, 19, RGB::named(rltk::WHEAT), RGB::named(rltk::BLACK));
+    ctx.draw_box_double(38, 19, 39, 19, RGB::named(rltk::WHEAT), RGB::named(rltk::BLACK));
     ctx.print_color(
         41,
         21,
@@ -609,6 +609,42 @@ pub fn show_intro(gs: &mut State, ctx: &mut Rltk) -> bool {
     ctx.print_color(41, 34, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), "or something.");
 
     ctx.print_color(41, 36, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), "Hope you enjoy.");
+
+    match ctx.key {
+        None => false,
+        Some(_) => true,
+    }
+}
+
+pub fn show_ending(gs: &mut State, ctx: &mut Rltk) -> bool {
+    let assets = gs.ecs.fetch::<RexAssets>();
+    ctx.render_xp_sprite(&assets.ending, 0, 0);
+
+    ctx.draw_box_double(38, 19, 40, 9, RGB::named(rltk::PURPLE), RGB::named(rltk::BLACK));
+    ctx.print_color(41, 21, RGB::named(rltk::GOLD), RGB::named(rltk::BLACK), "CONGRATULATIONS");
+
+    ctx.print_color(
+        41,
+        23,
+        RGB::named(rltk::WHITE),
+        RGB::named(rltk::BLACK),
+        "Turns out you were after an amulet",
+    );
+    ctx.print_color(
+        41,
+        24,
+        RGB::named(rltk::WHITE),
+        RGB::named(rltk::BLACK),
+        "the whole time, and you got it.",
+    );
+
+    ctx.print_color(
+        41,
+        25,
+        RGB::named(rltk::WHITE),
+        RGB::named(rltk::BLACK),
+        "(offscreen). Well done.",
+    );
 
     match ctx.key {
         None => false,

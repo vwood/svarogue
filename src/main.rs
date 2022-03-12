@@ -48,6 +48,7 @@ pub enum RunState {
     ShowIntro,
     ShowRemoveItem,
     GameOver,
+    ShowEnding,
     MoveWeapon,
     MoveShield,
     Dodge,
@@ -265,6 +266,12 @@ impl GameState for State {
                     newrunstate = RunState::PreRun;
                 }
             }
+            RunState::ShowEnding { .. } => {
+                if gui::show_ending(self, ctx) {
+                    newrunstate =
+                        RunState::MainMenu { menu_selection: gui::MainMenuSelection::NewGame };
+                }
+            }
             RunState::MainMenu { .. } => {
                 let result = gui::main_menu(self, ctx);
                 match result {
@@ -305,8 +312,11 @@ impl GameState for State {
                     RunState::MainMenu { menu_selection: gui::MainMenuSelection::LoadGame };
             }
             RunState::NextLevel => {
-                self.goto_next_level();
-                newrunstate = RunState::PreRun;
+                if self.goto_next_level() {
+                    newrunstate = RunState::PreRun;
+                } else {
+                    newrunstate = RunState::ShowEnding;
+                }
             }
 
             // TODO: this
@@ -373,7 +383,7 @@ impl State {
         to_delete
     }
 
-    fn goto_next_level(&mut self) {
+    fn goto_next_level(&mut self) -> bool {
         // Delete entities that aren't the player or his/her equipment
         let to_delete = self.entities_to_remove_on_level_change();
         for target in to_delete {
@@ -387,6 +397,10 @@ impl State {
             let worldmap_resource = self.ecs.write_resource::<Map>();
             current_depth = worldmap_resource.depth;
         }
+        if current_depth > 3 {
+            return false;
+        }
+
         self.generate_world_map(current_depth + 1);
 
         let player_entity = self.ecs.fetch::<Entity>();
@@ -402,6 +416,8 @@ impl State {
             player_health.hp =
                 i32::min(player_health.max_hp, player_health.hp + player_health.max_hp / 2);
         }
+
+        true
     }
 
     fn game_over_cleanup(&mut self) {
