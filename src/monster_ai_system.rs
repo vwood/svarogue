@@ -62,7 +62,7 @@ impl<'a> System<'a> for MonsterAI {
                     wants_to_melee
                         .insert(entity, WantsToMelee { target: *player_entity })
                         .expect("Unable to insert attack");
-                } else if viewshed.visible_tiles.contains(&*player_pos) || rng.roll_dice(1, 8) == 0
+                } else if viewshed.visible_tiles.contains(&*player_pos) || rng.roll_dice(1, 8) == 1
                 {
                     // Path to the player
                     let path = rltk::a_star_search(

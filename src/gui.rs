@@ -532,7 +532,7 @@ pub fn show_intro(gs: &mut State, ctx: &mut Rltk) -> bool {
     let assets = gs.ecs.fetch::<RexAssets>();
     ctx.render_xp_sprite(&assets.intro, 0, 0);
 
-    ctx.draw_box_double(38, 19, 39, 19, RGB::named(rltk::WHEAT), RGB::named(rltk::BLACK));
+    ctx.draw_box_double(38, 19, 39, 24, RGB::named(rltk::WHEAT), RGB::named(rltk::BLACK));
     ctx.print_color(
         41,
         21,
@@ -570,39 +570,63 @@ pub fn show_intro(gs: &mut State, ctx: &mut Rltk) -> bool {
         RGB::named(rltk::BLACK),
         "then the direction to dodge",
     );
+
     ctx.print_color(
         41,
         29,
+        RGB::named(rltk::WHITE),
+        RGB::named(rltk::BLACK),
+        "Bump attacking is less effective",
+    );
+
+    ctx.print_color(
+        41,
+        30,
+        RGB::named(rltk::WHITE),
+        RGB::named(rltk::BLACK),
+        "than your weapon (*) that is a",
+    );
+    ctx.print_color(
+        41,
+        31,
+        RGB::named(rltk::WHITE),
+        RGB::named(rltk::BLACK),
+        "separate entity that moves with you",
+    );
+    ctx.print_color(
+        41,
+        33,
         RGB::named(rltk::WHITE),
         RGB::named(rltk::BLACK),
         "You can move your weapon with A and ",
     );
     ctx.print_color(
         41,
-        30,
+        34,
         RGB::named(rltk::WHITE),
         RGB::named(rltk::BLACK),
         "then moving in a similar manner.",
     );
+
     ctx.print_color(
         41,
-        32,
+        35,
         RGB::named(rltk::WHITE),
         RGB::named(rltk::BLACK),
         "Both cost stamina, which you regain ",
     );
-    ctx.print_color(41, 33, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), "by resting (space)");
+    ctx.print_color(41, 36, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), "by resting (space)");
 
     ctx.print_color(
         41,
-        34,
+        38,
         RGB::named(rltk::WHITE),
         RGB::named(rltk::BLACK),
         "You're probably after an amulet ",
     );
-    ctx.print_color(41, 35, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), "or something.");
+    ctx.print_color(41, 39, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), "or something.");
 
-    ctx.print_color(41, 37, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), "Hope you enjoy.");
+    ctx.print_color(41, 41, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), "Hope you enjoy.");
 
     match ctx.key {
         None => false,
