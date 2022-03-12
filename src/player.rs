@@ -86,6 +86,10 @@ pub fn try_move_weapon(delta_x: i32, delta_y: i32, ecs: &mut World) {
         let destination_idx = map.xy_idx(pos.x + delta_x, pos.y + delta_y);
 
         for potential_target in map.tile_content[destination_idx].iter() {
+            if *potential_target == *player_entity {
+                return;
+            }
+
             let target = combat_stats.get(*potential_target);
             if let Some(_target) = target {
                 wants_to_melee
