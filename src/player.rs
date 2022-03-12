@@ -1,6 +1,6 @@
 use super::{
     gamelog::GameLog, CombatStats, EntityMoved, Item, Map, Monster, Player, Position, RunState,
-    State, TileType, Viewshed, WantsToMelee, WantsToPickupItem,
+    State, TileType, Viewshed, WantsToMelee, WantsToPickupItem, WeaponStats,
 };
 use rltk::{Point, Rltk, VirtualKeyCode};
 use specs::prelude::*;
@@ -51,6 +51,19 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
                 .expect("Unable to insert marker");
         }
     }
+}
+
+pub fn try_move_weapon(delta_x: i32, delta_y: i32, ecs: &mut World) {
+    let player_entity = ecs.fetch::<Entity>();
+
+    let positions = ecs.write_storage::<Position>();
+    let weapon_stats = ecs.read_storage::<WeaponStats>();
+
+    let weapon = (&weapon_stats, &positions)
+        .join()
+        .filter(|item| item.0.owner == *player_entity);
+    let count = weapon.count();
+    println!("COUNT: {}", count);
 }
 
 pub fn try_next_level(ecs: &mut World) -> bool {
@@ -231,58 +244,50 @@ pub fn player_weapon_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
         Some(key) => match key {
             VirtualKeyCode::Left | VirtualKeyCode::Numpad4 | VirtualKeyCode::H => {
                 if player_use_stamina(&mut gs.ecs, 1) {
-                    try_move_player(-1, 0, &mut gs.ecs);
-                    try_move_player(-1, 0, &mut gs.ecs);
+                    try_move_weapon(-1, 0, &mut gs.ecs);
                 }
             }
 
             VirtualKeyCode::Right | VirtualKeyCode::Numpad6 | VirtualKeyCode::L => {
                 if player_use_stamina(&mut gs.ecs, 1) {
-                    try_move_player(1, 0, &mut gs.ecs);
-                    try_move_player(1, 0, &mut gs.ecs);
+                    try_move_weapon(1, 0, &mut gs.ecs);
                 }
             }
 
             VirtualKeyCode::Up | VirtualKeyCode::Numpad8 | VirtualKeyCode::K => {
                 if player_use_stamina(&mut gs.ecs, 1) {
-                    try_move_player(0, -1, &mut gs.ecs);
-                    try_move_player(0, -1, &mut gs.ecs);
+                    try_move_weapon(0, -1, &mut gs.ecs);
                 }
             }
 
             VirtualKeyCode::Down | VirtualKeyCode::Numpad2 | VirtualKeyCode::J => {
                 if player_use_stamina(&mut gs.ecs, 1) {
-                    try_move_player(0, 1, &mut gs.ecs);
-                    try_move_player(0, 1, &mut gs.ecs);
+                    try_move_weapon(0, 1, &mut gs.ecs);
                 }
             }
 
             // Diagonals
             VirtualKeyCode::Numpad9 | VirtualKeyCode::U => {
                 if player_use_stamina(&mut gs.ecs, 1) {
-                    try_move_player(1, -1, &mut gs.ecs);
-                    try_move_player(1, -1, &mut gs.ecs);
+                    try_move_weapon(1, -1, &mut gs.ecs);
                 }
             }
 
             VirtualKeyCode::Numpad7 | VirtualKeyCode::Y => {
                 if player_use_stamina(&mut gs.ecs, 1) {
-                    try_move_player(-1, -1, &mut gs.ecs);
-                    try_move_player(-1, -1, &mut gs.ecs);
+                    try_move_weapon(-1, -1, &mut gs.ecs);
                 }
             }
 
             VirtualKeyCode::Numpad3 | VirtualKeyCode::N => {
                 if player_use_stamina(&mut gs.ecs, 1) {
-                    try_move_player(1, 1, &mut gs.ecs);
-                    try_move_player(1, 1, &mut gs.ecs);
+                    try_move_weapon(1, 1, &mut gs.ecs);
                 }
             }
 
             VirtualKeyCode::Numpad1 | VirtualKeyCode::B => {
                 if player_use_stamina(&mut gs.ecs, 1) {
-                    try_move_player(-1, 1, &mut gs.ecs);
-                    try_move_player(-1, 1, &mut gs.ecs);
+                    try_move_weapon(-1, 1, &mut gs.ecs);
                 }
             }
 

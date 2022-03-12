@@ -69,8 +69,6 @@ pub fn reset_weapon_locations(ecs: &mut World) {
     let mut positions = ecs.write_storage::<Position>();
     let entities = ecs.entities();
 
-    // let target_name = names.get(wants_melee.target).unwrap();
-
     for (entity, stats) in (&entities, &weapon_stats).join() {
         let (x, y);
         {

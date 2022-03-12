@@ -268,7 +268,7 @@ impl DigMapTurbBuilder {
                     } else if x == room.x1 && x == 0 {
                         // no doors to edge of the map
                         result[x as usize][y as usize] = -1;
-                    } else if x == room.y1 && y == 0 {
+                    } else if y == room.y1 && y == 0 {
                         result[x as usize][y as usize] = -1;
                     } else if x == room.x1 {
                         result[x as usize][y as usize] = room_id * 4 + 1;
