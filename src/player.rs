@@ -7,6 +7,8 @@ use specs::prelude::*;
 use std::cmp::{max, min};
 
 pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
+    let mut player_moved = false;
+
     {
         let mut positions = ecs.write_storage::<Position>();
         let players = ecs.read_storage::<Player>();
@@ -58,13 +60,16 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
                 entity_moved
                     .insert(entity, EntityMoved {})
                     .expect("Unable to insert marker");
+                player_moved = true;
             }
         }
     }
-    try_move_weapon(delta_x, delta_y, ecs);
+    try_move_weapon(delta_x, delta_y, ecs, player_moved);
 }
 
-pub fn try_move_weapon(delta_x: i32, delta_y: i32, ecs: &mut World) {
+/// TODO: use A* pathing to follow player if we can't move the weapon or we get too
+/// far away and the player moved
+pub fn try_move_weapon(delta_x: i32, delta_y: i32, ecs: &mut World, player_moved: bool) {
     let player_entity = ecs.fetch::<Entity>();
 
     let mut positions = ecs.write_storage::<Position>();
@@ -95,7 +100,11 @@ pub fn try_move_weapon(delta_x: i32, delta_y: i32, ecs: &mut World) {
 
         for potential_target in map.tile_content[destination_idx].iter() {
             if *potential_target == *player_entity {
-                continue; // return;
+                if player_moved {
+                    continue;
+                } else {
+                    return;
+                }
             }
 
             let target = combat_stats.get(*potential_target);
@@ -288,50 +297,50 @@ pub fn player_weapon_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
         Some(key) => match key {
             VirtualKeyCode::Left | VirtualKeyCode::Numpad4 | VirtualKeyCode::H => {
                 if player_use_stamina(&mut gs.ecs, 1) {
-                    try_move_weapon(-1, 0, &mut gs.ecs);
+                    try_move_weapon(-1, 0, &mut gs.ecs, false);
                 }
             }
 
             VirtualKeyCode::Right | VirtualKeyCode::Numpad6 | VirtualKeyCode::L => {
                 if player_use_stamina(&mut gs.ecs, 1) {
-                    try_move_weapon(1, 0, &mut gs.ecs);
+                    try_move_weapon(1, 0, &mut gs.ecs, false);
                 }
             }
 
             VirtualKeyCode::Up | VirtualKeyCode::Numpad8 | VirtualKeyCode::K => {
                 if player_use_stamina(&mut gs.ecs, 1) {
-                    try_move_weapon(0, -1, &mut gs.ecs);
+                    try_move_weapon(0, -1, &mut gs.ecs, false);
                 }
             }
 
             VirtualKeyCode::Down | VirtualKeyCode::Numpad2 | VirtualKeyCode::J => {
                 if player_use_stamina(&mut gs.ecs, 1) {
-                    try_move_weapon(0, 1, &mut gs.ecs);
+                    try_move_weapon(0, 1, &mut gs.ecs, false);
                 }
             }
 
             // Diagonals
             VirtualKeyCode::Numpad9 | VirtualKeyCode::U => {
                 if player_use_stamina(&mut gs.ecs, 1) {
-                    try_move_weapon(1, -1, &mut gs.ecs);
+                    try_move_weapon(1, -1, &mut gs.ecs, false);
                 }
             }
 
             VirtualKeyCode::Numpad7 | VirtualKeyCode::Y => {
                 if player_use_stamina(&mut gs.ecs, 1) {
-                    try_move_weapon(-1, -1, &mut gs.ecs);
+                    try_move_weapon(-1, -1, &mut gs.ecs, false);
                 }
             }
 
             VirtualKeyCode::Numpad3 | VirtualKeyCode::N => {
                 if player_use_stamina(&mut gs.ecs, 1) {
-                    try_move_weapon(1, 1, &mut gs.ecs);
+                    try_move_weapon(1, 1, &mut gs.ecs, false);
                 }
             }
 
             VirtualKeyCode::Numpad1 | VirtualKeyCode::B => {
                 if player_use_stamina(&mut gs.ecs, 1) {
-                    try_move_weapon(-1, 1, &mut gs.ecs);
+                    try_move_weapon(-1, 1, &mut gs.ecs, false);
                 }
             }
 
@@ -355,6 +364,7 @@ pub fn player_weapon_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
 ///
 /// SHIELD MOVEMENT SYSTEM
 ///
+/// TODO: not yet
 pub fn player_shield_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
     // Player movement - shield movement mode
     match ctx.key {
