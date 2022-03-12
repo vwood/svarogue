@@ -4,7 +4,6 @@ use rltk::RandomNumberGenerator;
 use rltk::{Algorithm2D, BaseMap, Point, Rltk, RGB};
 use serde::{Deserialize, Serialize};
 use specs::prelude::*;
-use std::collections::HashSet;
 
 pub const MAPWIDTH: usize = 80;
 pub const MAPHEIGHT: usize = 43;

@@ -426,6 +426,7 @@ impl DigMapTurbBuilder {
         self.starting_position = Position { x: start_x, y: start_y };
     }
 
+    #[allow(dead_code)]
     fn dig_map(&mut self) {
         const CONSTANT: f64 = -0.1;
         const EDGE_WEIGHT: f64 = 2.5;
