@@ -66,6 +66,7 @@ pub fn weapon_entity(ecs: &mut World, x: i32, y: i32, owner: Entity) -> Entity {
             power: 8,
         })
         .with(Name { name: "Player Weapon".to_string() })
+        .with(BlocksTile {})
         .marked::<SimpleMarker<SerializeMe>>()
         .build()
 }
