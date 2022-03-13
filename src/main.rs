@@ -87,6 +87,7 @@ impl State {
     }
 
     fn generate_world_map(&mut self, new_depth: i32) {
+        let (player_x, player_y);
         {
             let mut builder = map_builders::random_builder(new_depth);
             builder.build_map();
@@ -102,7 +103,8 @@ impl State {
             builder.spawn_entities(&mut self.ecs);
 
             // Place the player and update resources
-            let (player_x, player_y) = (player_start.x, player_start.y);
+            player_x = player_start.x;
+            player_y = player_start.y;
             let mut player_position = self.ecs.write_resource::<Point>();
             *player_position = Point::new(player_x, player_y);
             let mut position_components = self.ecs.write_storage::<Position>();
@@ -121,6 +123,7 @@ impl State {
             }
         }
 
+        spawner::player_weapon(&mut self.ecs);
         spawner::reset_weapon_locations(&mut self.ecs);
     }
 }

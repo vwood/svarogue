@@ -5,7 +5,7 @@ use super::{
     Position, ProvidesHealing, Ranged, Rect, Renderable, SerializeMe, SingleActivation, Viewshed,
     WeaponStats,
 };
-use rltk::{RandomNumberGenerator, RGB};
+use rltk::{Point, RandomNumberGenerator, RGB};
 use specs::prelude::*;
 use specs::saveload::{MarkedBuilder, SimpleMarker};
 use std::collections::HashMap;
@@ -40,8 +40,8 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
         .marked::<SimpleMarker<SerializeMe>>()
         .build();
 
-    let (x, y) = find_empty_adjacent(ecs, player_x, player_y);
-    weapon_entity(ecs, x, y, entity);
+    //    let (x, y) = find_empty_adjacent(ecs, player_x, player_y);
+    //    weapon_entity(ecs, x, y, entity);
 
     entity
 }
@@ -69,6 +69,18 @@ pub fn weapon_entity(ecs: &mut World, x: i32, y: i32, owner: Entity) -> Entity {
         .with(BlocksTile {})
         .marked::<SimpleMarker<SerializeMe>>()
         .build()
+}
+
+pub fn player_weapon(ecs: &mut World) -> Entity {
+    let player_entity = *ecs.fetch::<Entity>();
+    let new_xy;
+    {
+        let player_position = ecs.read_resource::<Point>();
+
+        new_xy = find_empty_adjacent(ecs, player_position.x, player_position.y);
+    }
+    // weapon_entity(ecs, player_position.x, player_position.y, *player_entity);
+    weapon_entity(ecs, new_xy.0, new_xy.1, player_entity)
 }
 
 /// Resets the weapon location
