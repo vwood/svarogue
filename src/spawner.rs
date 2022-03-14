@@ -85,8 +85,7 @@ pub fn player_weapon(ecs: &mut World) -> Entity {
 
 /// Resets the weapon location
 pub fn reset_weapon_locations(ecs: &mut World) {
-    let mut weapon_stats = ecs.write_storage::<WeaponStats>();
-    let players = ecs.read_storage::<Player>();
+    let weapon_stats = ecs.read_storage::<WeaponStats>();
     let mut positions = ecs.write_storage::<Position>();
     let entities = ecs.entities();
 
@@ -95,15 +94,11 @@ pub fn reset_weapon_locations(ecs: &mut World) {
         {
             let position = positions.get(stats.owner).unwrap();
 
-            // silly unstable destructuring assignments
-            let new_xy = find_empty_adjacent(ecs, position.x, position.y);
-            x = new_xy.0;
-            y = new_xy.1;
+            (x, y) = find_empty_adjacent(ecs, position.x, position.y);
         }
 
         let pos = positions.get_mut(entity).unwrap();
-        pos.x = x;
-        pos.y = y;
+        (pos.x, pos.y) = (x, y);
     }
 }
 

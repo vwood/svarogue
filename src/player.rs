@@ -90,12 +90,7 @@ pub fn try_move_weapon_w_player(
     let map = ecs.fetch::<Map>();
     let mut wants_to_melee = ecs.write_storage::<WantsToMelee>();
 
-    let weapon = (&weapon_stats, &positions)
-        .join()
-        .filter(|item| item.0.owner == *player_entity);
-    let count = weapon.count();
-
-    for (entity, weaponstat, pos) in (&entities, &weapon_stats, &mut positions)
+    for (entity, _weaponstat, pos) in (&entities, &weapon_stats, &mut positions)
         .join()
         .filter(|item| item.1.owner == *player_entity)
     {
@@ -148,8 +143,7 @@ pub fn try_move_weapon_simple(delta_x: i32, delta_y: i32, ecs: &mut World) {
 
     // only used if player_moved for detection
     let player_pos = ecs.fetch::<Point>();
-    let player_x = player_pos.x + delta_x;
-    let player_y = player_pos.y + delta_y;
+    let (player_x, player_y) = (player_pos.x + delta_x, player_pos.y + delta_y);
 
     let mut positions = ecs.write_storage::<Position>();
     let weapon_stats = ecs.read_storage::<WeaponStats>();
@@ -158,24 +152,15 @@ pub fn try_move_weapon_simple(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let map = ecs.fetch::<Map>();
     let mut wants_to_melee = ecs.write_storage::<WantsToMelee>();
 
-    let weapon = (&weapon_stats, &positions)
-        .join()
-        .filter(|item| item.0.owner == *player_entity);
-    let count = weapon.count();
-
-    for (entity, weaponstat, pos) in (&entities, &weapon_stats, &mut positions)
+    for (entity, _weaponstat, pos) in (&entities, &weapon_stats, &mut positions)
         .join()
         .filter(|item| item.1.owner == *player_entity)
     {
-        if pos.x + delta_x < 0
-            || pos.x + delta_x > map.width - 1
-            || pos.y + delta_y < 0
-            || pos.y + delta_y > map.height - 1
-        {
+        if player_x < 0 || player_x > map.width - 1 || player_y < 0 || player_y > map.height - 1 {
             return;
         }
 
-        let destination_idx = map.xy_idx(pos.x + delta_x, pos.y + delta_y);
+        let destination_idx = map.xy_idx(player_x, player_y);
 
         for potential_target in map.tile_content[destination_idx].iter() {
             if *potential_target == *player_entity {
@@ -192,8 +177,8 @@ pub fn try_move_weapon_simple(delta_x: i32, delta_y: i32, ecs: &mut World) {
         }
 
         if !map.blocked[destination_idx] {
-            pos.x = min(79, max(0, pos.x + delta_x));
-            pos.y = min(49, max(0, pos.y + delta_y));
+            pos.x = min(79, max(0, player_x));
+            pos.y = min(49, max(0, player_y));
         }
     }
 }
@@ -523,7 +508,7 @@ pub fn player_shield_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
 /// DODGE SYSTEM
 ///
 pub fn player_dodge_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
-    let mut is_dodge = false;
+    let is_dodge;
     let dx;
     let dy;
 
